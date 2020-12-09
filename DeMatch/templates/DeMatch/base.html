@@ -1,0 +1,25 @@
+{% load static %}
+
+<html lang="ja">
+
+  <head>
+    <meta charset="utf-8">
+    <!-- viewportの設定　デバイスのwidthと同じ大きさ(initial-scale=1)で表示する -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 検索したときのtitleの下のdescrition　ここは誰か設定して -->
+    <meta name="description" content="">
+
+    <title>{% block title %}{% endblock %}</title>
+    
+    <!-- css base.html用 -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+  
+    {% block head %}{% endblock %}
+  </head>
+
+  <body>
+    
+  </body>
+
+
+</html>

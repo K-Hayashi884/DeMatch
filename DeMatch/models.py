@@ -83,7 +83,10 @@ class User(AbstractUser):
     requesting_friends = models.ManyToManyField(
         "self", symmetrical=False, related_name="being_requested_friends"
     )
-
+    
+class UserImg(models.Model):
+    img = models.ImageField(upload_to="user_images")
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
 
 class UserFriendRelation(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_relation")
@@ -91,6 +94,18 @@ class UserFriendRelation(models.Model):
     is_blocked = models.BooleanField(default=False)
 
 
-class UserImg(models.Model):
-    img = models.ImageField(upload_to="images")
-    user = models.ForeignKey("User", on_delete=models.CASCADE)
+class Group(models.Model):
+    name = models.CharField(max_length=30)
+    image = models.ImageField(blank=True, null=True, verbose_name="group_image", upload_to="group_images")
+    hobby = models.ManyToManyField(Hobby, related_name="hobby_group")
+    subject = models.ManyToManyField(Subject, related_name="subject_group")
+    introduction = models.TextField(max_length=200, blank=True, null=True)
+    member_list = models.ManyToManyField(User, related_name="group_member")
+    inviting = models.ManyToManyField(User, related_name="inviting_user")
+    applying = models.ManyToManyField(User, related_name="applying_user")
+
+    def __str__(self):
+        return self.name
+      
+
+
