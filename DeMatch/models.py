@@ -94,3 +94,14 @@ class UserFriendRelation(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_relation")
     friend = models.ForeignKey("User", on_delete=models.CASCADE, related_name="friend_relation")
     is_blocked = models.BooleanField(default=False)
+
+
+class Group(models.Model):
+    name = models.CharField(max_length=30)
+    image = models.ImageField(blank=True, null=True, verbose_name="group_image")
+    hobby = models.ManyToManyField(Hobby, related_name="hobby_group")
+    subject = models.ManyToManyField(Subject, related_name="subject_group")
+    introduction = models.TextField(max_length=200, blank=True, null=True)
+    member_list = models.ManyToManyField(User, related_name="group_member")
+    inviting = models.ManyToManyField(User, related_name="inviting_user")
+    applying = models.ManyToManyField(User, related_name="applying_user")
