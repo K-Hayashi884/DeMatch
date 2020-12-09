@@ -9,7 +9,6 @@ from django.contrib.auth.models import AbstractUser
 class Hobby(models.Model):
     name = models.CharField(max_length=30)
     category = models.CharField(max_length=30)
-    favorite = models.BooleanField(default=False)
 
 
 class Subject(models.Model):
@@ -84,7 +83,6 @@ class User(AbstractUser):
     requesting_friends = models.ManyToManyField(
         "self", symmetrical=False, related_name="being_requested_friends"
     )
-    # requesting_groups = models.ManyToManyField("Group", related_name="being_requested_groups")
 
 
 class UserFriendRelation(models.Model):
