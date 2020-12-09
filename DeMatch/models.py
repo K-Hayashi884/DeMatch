@@ -9,18 +9,11 @@ from django.contrib.auth.models import AbstractUser
 class Hobby(models.Model):
     name = models.CharField(max_length=30)
     category = models.CharField(max_length=30)
-    favorite = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
 
 
 class Subject(models.Model):
     name = models.CharField(max_length=30)
     category = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.name
 
 
 def check_email(value):
@@ -87,10 +80,17 @@ class User(AbstractUser):
         through_fields=("user", "friend"),
         related_name="friends_user",
     )
-    requesting = models.ManyToManyField("self", symmetrical=False, related_name="requesting_user")
+    requesting_friends = models.ManyToManyField(
+        "self", symmetrical=False, related_name="being_requested_friends"
+    )
 
 
 class UserFriendRelation(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_relation")
     friend = models.ForeignKey("User", on_delete=models.CASCADE, related_name="friend_relation")
     is_blocked = models.BooleanField(default=False)
+
+
+class UserImg(models.Model):
+    img = models.ImageField(upload_to="images")
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
