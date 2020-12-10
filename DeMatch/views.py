@@ -1,17 +1,10 @@
 from django.shortcuts import render
 from .models import User, Hobby, Subject, UserFriendRelation, UserImg, Group
-from .forms import CreateGroupForm
+from .forms import CreateGroupForm, InputProfileForm
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-#groupの作成
-class GroupCreateView(LoginRequiredMixin, generic.CreateView):
-  model = Group
-  template_name = 'create_group.html'
-  from_class = CreateGroupForm
-  success_url = reverse_lazy()
 
-  
 def home(request):
     user = request.user
     friends = user.friends
@@ -24,3 +17,8 @@ def home(request):
         "being_requested_friends": being_requested_friends,
     }
     return render(request, "DeMatch/home.html", params)
+
+
+def input_profile(request):
+    params = {"form": InputProfileForm()}
+    return render(request, "input_profile.html", params)
