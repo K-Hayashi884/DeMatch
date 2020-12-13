@@ -14,10 +14,11 @@ class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     success_url = reverse_lazy('group_detail')
 
     def form_valid(self, form):
-      diary = form.save()
-      return super().form_valid(form)
+        group = form.save()
+        return super().form_valid(form)
     def form_invalid(self, form):
         messages.error(self.request, "Groupの作成に失敗しました。")
+        return super().form_invalid(form)
 
 #groupの詳細
 #id一致で取得。id情報はurlに組み込む
@@ -37,9 +38,13 @@ class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('group_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def form_valid(self, form):
+        return super().form_valid(form)
     
     def form_invalid(self, form):
         messages.error(self.request, "Groupの作成に失敗しました。")
+        return super().form_invalid(form)
 
   
 def home(request):
