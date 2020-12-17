@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import User, Group
+from .models import User, Group, Hobby, Subject
 
 
 class CreateGroupForm(ModelForm):
@@ -39,6 +39,13 @@ class CreateGroupForm(ModelForm):
 
 
 class InputProfileForm(ModelForm):
+    hobby = forms.ModelMultipleChoiceField(
+        queryset=Hobby.objects, widget=forms.CheckboxSelectMultiple
+    )
+    subject = forms.ModelMultipleChoiceField(
+        queryset=Subject.objects, widget=forms.CheckboxSelectMultiple
+    )
+
     class Meta:
         model = User
         fields = [
@@ -48,4 +55,36 @@ class InputProfileForm(ModelForm):
             "introduction",
             "hobby",
             "subject",
+        ]
+
+
+class MainImageForm(ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "main_img_source",
+        ]
+
+
+class Sub1ImageForm(ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "sub1_img_source",
+        ]
+
+
+class Sub2ImageForm(ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "sub2_img_source",
+        ]
+
+
+class Sub3ImageForm(ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "sub3_img_source",
         ]

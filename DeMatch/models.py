@@ -2,6 +2,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 # Create your models here.
 
@@ -29,6 +31,30 @@ def check_email(value):
 
 class User(AbstractUser):
     email = models.EmailField(validators=[check_email])
+    main_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    main_img = ImageSpecField(
+        source = 'main_img_source',
+        processors = [ResizeToFill(256,256)],
+        format = 'PNG'
+    )
+    sub1_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    sub1_img = ImageSpecField(
+        source = 'sub1_img_source',
+        processors = [ResizeToFill(256,256)],
+        format = 'PNG'
+    )
+    sub2_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    sub2_img = ImageSpecField(
+        source = 'sub2_img_source',
+        processors = [ResizeToFill(256,256)],
+        format = 'PNG'
+    )
+    sub3_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    sub3_img = ImageSpecField(
+        source = 'sub3_img_source',
+        processors = [ResizeToFill(256,256)],
+        format = 'PNG'
+    )
     belong_to = models.CharField(
         choices=[
             ("H", "総合人間学部"),
@@ -81,18 +107,23 @@ class User(AbstractUser):
         max_length=200,
         default=None,
     )
-    hobby = models.ManyToManyField("Hobby", related_name="hobby_user")
-    subject = models.ManyToManyField("Subject", related_name="subject_user")
+    hobby = models.ManyToManyField("Hobby", related_name="hobby_user", blank=True)
+    subject = models.ManyToManyField("Subject", related_name="subject_user", blank=True)
     friends = models.ManyToManyField(
         "self",
         symmetrical=False,
         through="UserFriendRelation",
         through_fields=("user", "friend"),
         related_name="friends_user",
+        blank=True,
     )
     requesting_friends = models.ManyToManyField(
-        "self", symmetrical=False, related_name="being_requested_friends"
+        "self", symmetrical=False, related_name="being_requested_friends", blank=True
     )
+
+    def get_cropping_as_list(self):
+        if self.cropping:
+            return list(map(int, self.cropping.split(",")))
 
 
 class UserImg(models.Model):
