@@ -1,6 +1,4 @@
 from django.shortcuts import render
-import os
-from pathlib import Path
 from .models import User, Hobby, Subject, UserFriendRelation, UserImg, Group
 from .forms import (
     CreateGroupForm,
@@ -14,6 +12,7 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
+
 def home(request):
     user = request.user
     params = {
@@ -23,20 +22,13 @@ def home(request):
 
 
 def input_profile(request):
-    params = {"form": InputProfileForm()}
+    form = InputProfileForm(instance=request.user)
+    if request.method == "POST":
+        form = InputProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+    params = {"form": form}
     return render(request, "DeMatch/input_profile.html", params)
-
-
-def crop_center(img):
-    img_width, img_height = img.size
-    return img.crop(
-        (
-            (img_width - min(img.size)) // 2,
-            (img_height - min(img.size)) // 2,
-            (img_width + min(img.size)) // 2,
-            (img_height + min(img.size)) // 2,
-        )
-    )
 
 
 @login_required
@@ -57,7 +49,7 @@ def cropping(request, img_name):
             msg = "画像を変更しました"
         else:
             msg = "画像の変更に失敗しました"
-            
+
     if img_name == "sub1":
         title = "サブ画像１の設定"
         user_img = user.sub1_img
@@ -81,3 +73,8 @@ def cropping(request, img_name):
         "msg": msg,
     }
     return render(request, "DeMatch/cropping.html", params)
+
+
+class UserDetail(generic.DetailView):
+    template_name = "DeMatch/user_detail.html"
+    model = User
