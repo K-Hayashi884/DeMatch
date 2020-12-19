@@ -1,9 +1,8 @@
 from django import forms
-from django.forms import ModelForm
 from .models import User, Group, Hobby, Subject
 
 
-class CreateGroupForm(ModelForm):
+class CreateGroupForm(forms.ModelForm):
     class Meta:
         model = Group
         fields = [
@@ -38,7 +37,7 @@ class CreateGroupForm(ModelForm):
         group.save()
 
 
-class InputProfileForm(ModelForm):
+class InputProfileForm(forms.ModelForm):
     hobby = forms.ModelMultipleChoiceField(
         queryset=Hobby.objects, widget=forms.CheckboxSelectMultiple
     )
@@ -58,7 +57,7 @@ class InputProfileForm(ModelForm):
         ]
 
 
-class MainImageForm(ModelForm):
+class MainImageForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
@@ -66,7 +65,7 @@ class MainImageForm(ModelForm):
         ]
 
 
-class Sub1ImageForm(ModelForm):
+class Sub1ImageForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
@@ -74,7 +73,7 @@ class Sub1ImageForm(ModelForm):
         ]
 
 
-class Sub2ImageForm(ModelForm):
+class Sub2ImageForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
@@ -82,7 +81,7 @@ class Sub2ImageForm(ModelForm):
         ]
 
 
-class Sub3ImageForm(ModelForm):
+class Sub3ImageForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [

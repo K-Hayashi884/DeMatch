@@ -1,0 +1,57 @@
+<a href="{% url 'home' %}">戻るボタン</a>
+user detail<br>
+{{ user.username }}
+
+{% if friend_flg %}
+
+{% if blocking_flg %}
+ブロック中です
+<form action="{% url 'DeMatch:block' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="block_btn">ブロック解除</button>
+</form>
+{% elif blocked_flg %}
+ブロックされています
+<form action="{% url 'DeMatch:block' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="block_btn">ブロック</button>
+</form>
+{% else %}
+フォロー中
+<form action="{% url 'DeMatch:block' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="block_btn">ブロック</button>
+</form>
+{% endif %}
+
+{% elif being_requested_flg %}
+<form action="{% url 'DeMatch:friend_request' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="request_btn">申請されています
+</form>
+
+<form action="{% url 'DeMatch:block' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="block_btn">ブロック</button>
+</form>
+{% elif requesting_flg %}
+<form action="{% url 'DeMatch:friend_request' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="request_btn">申請中</button>
+</form>
+{% else %}
+<form action="{% url 'DeMatch:friend_request' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="request_btn">友達申請</button>
+</form>
+
+<form action="{% url 'DeMatch:block' user.pk %}" method="post">
+    {% csrf_token %}
+    <button type="submit" name="block_btn">ブロック</button>
+</form>
+{% endif %}
+
+{% if friend_flg %}
+<a href="#">トーク遷移</a><br>
+<a href="#">グループ招待</a>
+{% endif %}

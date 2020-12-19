@@ -33,27 +33,19 @@ class User(AbstractUser):
     email = models.EmailField(validators=[check_email])
     main_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
     main_img = ImageSpecField(
-        source = 'main_img_source',
-        processors = [ResizeToFill(256,256)],
-        format = 'PNG'
+        source="main_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
     )
     sub1_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
     sub1_img = ImageSpecField(
-        source = 'sub1_img_source',
-        processors = [ResizeToFill(256,256)],
-        format = 'PNG'
+        source="sub1_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
     )
     sub2_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
     sub2_img = ImageSpecField(
-        source = 'sub2_img_source',
-        processors = [ResizeToFill(256,256)],
-        format = 'PNG'
+        source="sub2_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
     )
     sub3_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
     sub3_img = ImageSpecField(
-        source = 'sub3_img_source',
-        processors = [ResizeToFill(256,256)],
-        format = 'PNG'
+        source="sub3_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
     )
     belong_to = models.CharField(
         choices=[
@@ -114,16 +106,11 @@ class User(AbstractUser):
         symmetrical=False,
         through="UserFriendRelation",
         through_fields=("user", "friend"),
-        related_name="friends_user",
         blank=True,
     )
-    requesting_friends = models.ManyToManyField(
-        "self", symmetrical=False, related_name="being_requested_friends", blank=True
+    friend_requesting = models.ManyToManyField(
+        "self", symmetrical=False, related_name="being_friend_requested", blank=True
     )
-
-    def get_cropping_as_list(self):
-        if self.cropping:
-            return list(map(int, self.cropping.split(",")))
 
 
 class UserImg(models.Model):
@@ -134,7 +121,8 @@ class UserImg(models.Model):
 class UserFriendRelation(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_relation")
     friend = models.ForeignKey("User", on_delete=models.CASCADE, related_name="friend_relation")
-    is_blocked = models.BooleanField(default=False)
+    # userから見てfriendをブロックしているか
+    is_blocking = models.BooleanField(default=False)
 
 
 class Group(models.Model):

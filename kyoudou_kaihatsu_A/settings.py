@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "DeMatch",
-    'imagekit',
+    "imagekit",
 ]
 
 MIDDLEWARE = [
@@ -141,7 +141,7 @@ except ImportError:
 SITE_ID = 1
 
 LOGIN_URL = "/accounts/login"
-LOGIN_REDIRET_URL = "DeMatch:home"
+LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login"
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
@@ -151,7 +151,7 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_REQUIRED = True
 
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "DeMatch:input_profile"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "DeMatch:input_profile"
 
 if DEBUG:
 
