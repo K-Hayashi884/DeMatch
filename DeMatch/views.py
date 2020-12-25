@@ -13,12 +13,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 
-def home(request):
-    user = request.user
-    params = {
-        "user": user,
-    }
-    return render(request, "DeMatch/home.html", params)
+class Home(generic.TemplateView, LoginRequiredMixin):
+    template_name = "DeMatch/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        being_requested_list = user.being_friend_requested.order_by("username")
+        friend_list = user.friends.order_by("username")
+        requesting_list = user.friend_requesting.order_by("username")
+        context["being_requested_list"] = being_requested_list
+        context["friend_list"] = friend_list
+        context["requesting_list"] = requesting_list
+        return context
 
 
 # 登録時のプロフィール入力
@@ -90,7 +97,7 @@ def cropping(request, img_name):
     return render(request, "DeMatch/cropping.html", params)
 
 
-class FriendDetail(generic.DetailView):
+class FriendDetail(generic.DetailView, LoginRequiredMixin):
     template_name = "DeMatch/friend_detail.html"
     model = User
 
@@ -157,5 +164,16 @@ def block(request, pk):
     return redirect(to=("../../friend_detail/" + str(pk)))
 
 
-# @login_required
-# def UserDetail()
+class UserDetail(generic.TemplateView, LoginRequiredMixin):
+    template_name = "DeMatch/user_detail.html"
+
+
+class BlockList(generic.TemplateView, LoginRequiredMixin):
+    template_name = "DeMatch/block_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        block_list = UserFriendRelation.objects.filter(user=user, is_blocking=True)
+        context["block_list"] = block_list
+        return context

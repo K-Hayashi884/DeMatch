@@ -1,4 +1,4 @@
-<a href="{% url 'home' %}">戻るボタン</a>
+<a href="{% url 'DeMatch:home' %}">戻るボタン</a>
 user detail<br>
 {{ user.username }}
 
@@ -51,7 +51,7 @@ user detail<br>
 </form>
 {% endif %}
 
-{% if friend_flg %}
+{% if friend_flg and not blocking_flg %}
 <a href="#">トーク遷移</a><br>
 <a href="#">グループ招待</a>
 {% endif %}
