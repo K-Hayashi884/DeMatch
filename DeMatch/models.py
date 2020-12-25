@@ -2,6 +2,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 # Create your models here.
 
@@ -10,10 +12,16 @@ class Hobby(models.Model):
     name = models.CharField(max_length=30)
     category = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.name
+
 
 class Subject(models.Model):
     name = models.CharField(max_length=30)
     category = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
 
 
 def check_email(value):
@@ -23,7 +31,23 @@ def check_email(value):
 
 class User(AbstractUser):
     email = models.EmailField(validators=[check_email])
-    belong_to = forms.fields.ChoiceField(
+    main_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    main_img = ImageSpecField(
+        source="main_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
+    )
+    sub1_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    sub1_img = ImageSpecField(
+        source="sub1_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
+    )
+    sub2_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    sub2_img = ImageSpecField(
+        source="sub2_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
+    )
+    sub3_img_source = models.ImageField(upload_to="user_images", null=True, blank=True)
+    sub3_img = ImageSpecField(
+        source="sub3_img_source", processors=[ResizeToFill(256, 256)], format="PNG"
+    )
+    belong_to = models.CharField(
         choices=[
             ("H", "総合人間学部"),
             ("L", "文学部"),
@@ -47,9 +71,11 @@ class User(AbstractUser):
             ("Af", "農学部｜食品生物学科"),
             ("Ph", "薬学部"),
         ],
-        widget=forms.widgets.Select,
+        max_length=100,
+        null=True,
+        blank=True,
     )
-    grade = forms.fields.ChoiceField(
+    grade = models.CharField(
         choices=[
             ("B1", "学部１回生"),
             ("B2", "学部２回生"),
@@ -63,7 +89,9 @@ class User(AbstractUser):
             ("D4", "博士４回生"),
             ("D5", "博士５回生"),
         ],
-        widget=forms.widgets.Select,
+        max_length=100,
+        null=True,
+        blank=True,
     )
     introduction = models.TextField(
         blank=True,
@@ -71,32 +99,37 @@ class User(AbstractUser):
         max_length=200,
         default=None,
     )
-    hobby = models.ManyToManyField("Hobby", related_name="hobby_user")
-    subject = models.ManyToManyField("Subject", related_name="subject_user")
+    hobby = models.ManyToManyField("Hobby", related_name="hobby_user", blank=True)
+    subject = models.ManyToManyField("Subject", related_name="subject_user", blank=True)
     friends = models.ManyToManyField(
         "self",
         symmetrical=False,
         through="UserFriendRelation",
         through_fields=("user", "friend"),
-        related_name="friends_user",
+        blank=True,
     )
-    requesting_friends = models.ManyToManyField(
-        "self", symmetrical=False, related_name="being_requested_friends"
+    friend_requesting = models.ManyToManyField(
+        "self", symmetrical=False, related_name="being_friend_requested", blank=True
     )
-    
+
+
 class UserImg(models.Model):
     img = models.ImageField(upload_to="user_images")
     user = models.ForeignKey("User", on_delete=models.CASCADE)
 
+
 class UserFriendRelation(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_relation")
     friend = models.ForeignKey("User", on_delete=models.CASCADE, related_name="friend_relation")
-    is_blocked = models.BooleanField(default=False)
+    # userから見てfriendをブロックしているか
+    is_blocking = models.BooleanField(default=False)
 
 
 class Group(models.Model):
     name = models.CharField(max_length=30)
-    image = models.ImageField(blank=True, null=True, verbose_name="group_image", upload_to="group_images")
+    image = models.ImageField(
+        blank=True, null=True, verbose_name="group_image", upload_to="group_images"
+    )
     hobby = models.ManyToManyField(Hobby, related_name="hobby_group")
     subject = models.ManyToManyField(Subject, related_name="subject_group")
     introduction = models.TextField(max_length=200, blank=True, null=True)
@@ -106,6 +139,3 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
-      
-
-

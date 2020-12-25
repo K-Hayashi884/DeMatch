@@ -1,0 +1,10 @@
+{{ title }}
+{{ msg }}
+{% if user_img %}
+<img src="{{ user_img.url }}">
+{% endif %}
+<form method="post" id="cropping_form" enctype="multipart/form-data">
+{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save" />
+</form>
