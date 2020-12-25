@@ -54,36 +54,8 @@ class InputProfileForm(forms.ModelForm):
             "introduction",
             "hobby",
             "subject",
-        ]
-
-
-class MainImageForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
             "main_img_source",
-        ]
-
-
-class Sub1ImageForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
             "sub1_img_source",
-        ]
-
-
-class Sub2ImageForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
             "sub2_img_source",
-        ]
-
-
-class Sub3ImageForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
             "sub3_img_source",
         ]
