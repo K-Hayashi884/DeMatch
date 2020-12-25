@@ -22,4 +22,9 @@ urlpatterns = [
     path("user_detail/", views.UserDetail.as_view(), name="user_detail"),
     # ブロックリスト
     path("block_list/", views.BlockList.as_view(), name="block_list"),
+
+    path("", views.home, name="home"),    
+    path("create_group/", views.GroupCreateView.as_view(), name="create_group"),
+    path("group_detail/<int:pk>/", views.GroupDetailView, name="group_detail"),
+    path("group_update/<int:pk>/", views.GroupUpdateView.as_view(), name="group_update"),
 ]

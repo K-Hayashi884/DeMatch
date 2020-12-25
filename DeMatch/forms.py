@@ -13,7 +13,7 @@ class CreateGroupForm(forms.ModelForm):
             "introduction",
             "inviting",
         ]
-
+        
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if user.friends():
@@ -59,3 +59,4 @@ class InputProfileForm(forms.ModelForm):
             "sub2_img_source",
             "sub3_img_source",
         ]
+
