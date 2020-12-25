@@ -1,5 +1,5 @@
 <ul>
     {% for block_list_item in block_list %}
-    <li>{{ block_list_item.friend }}</li>
+    <li><a href="{% url 'DeMatch:friend_detail' block_list_item.friend.pk %}">{{ block_list_item.friend }}</a></li>
     {% endfor %}
 </ul>

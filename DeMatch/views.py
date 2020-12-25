@@ -1,12 +1,8 @@
 from django.shortcuts import render, redirect
-from .models import User, Hobby, Subject, UserFriendRelation, UserImg, Group
+from .models import User, Hobby, Subject, UserFriendRelation, Group
 from .forms import (
     CreateGroupForm,
     InputProfileForm,
-    MainImageForm,
-    Sub1ImageForm,
-    Sub2ImageForm,
-    Sub3ImageForm,
 )
 from django.urls import reverse_lazy
 from django.views import generic
@@ -14,27 +10,29 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
-#groupの作成
+# groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
-    template_name = 'group_create.html'
+    template_name = "group_create.html"
     from_class = CreateGroupForm
-    success_url = reverse_lazy('group_detail')
+    success_url = reverse_lazy("group_detail")
 
     def form_valid(self, form):
         group = form.save()
         return super().form_valid(form)
+
     def form_invalid(self, form):
         messages.error(self.request, "Groupの作成に失敗しました。")
         return super().form_invalid(form)
 
-#groupの詳細
-#id一致で取得。id情報はurlに組み込む
+
+# groupの詳細
+# id一致で取得。id情報はurlに組み込む
 def GroupDetailView(request, pk):
     group = Group.objects.get(id=pk)
-    #htmlの表示を切り替える変数をここで設定
-    #他にいい方法がありそうなのであったら教えてください
-    #condition 0はメンバー　1は招待中　2は申請中　3はどれでもない
+    # htmlの表示を切り替える変数をここで設定
+    # 他にいい方法がありそうなのであったら教えてください
+    # condition 0はメンバー　1は招待中　2は申請中　3はどれでもない
     if group.member_list.filter(User=request.user):
         condition = 0
     elif group.inviting.filter(User=request.user):
@@ -43,30 +41,29 @@ def GroupDetailView(request, pk):
         condition = 2
     else:
         condition = 3
-    params = {
-        'group':group,
-        'condition':condition
-    }
+    params = {"group": group, "condition": condition}
     return render(request, "DeMatch/group_detail.html", params)
 
-#groupの編集
-#id一致で取得。id情報はurlに組み込む
+
+# groupの編集
+# id一致で取得。id情報はurlに組み込む
 class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Group
-    template_name = 'group_update.html'
+    template_name = "group_update.html"
     form_class = CreateGroupForm
-    
+
     def get_success_url(self):
-        return reverse_lazy('group_detail', kwargs={'pk': self.kwargs['pk']})
+        return reverse_lazy("group_detail", kwargs={"pk": self.kwargs["pk"]})
 
     def form_valid(self, form):
         return super().form_valid(form)
-    
+
     def form_invalid(self, form):
         messages.error(self.request, "Groupの作成に失敗しました。")
         return super().form_invalid(form)
 
-#ホーム画面
+
+# ホーム画面
 class Home(generic.TemplateView, LoginRequiredMixin):
     template_name = "DeMatch/home.html"
 
@@ -74,7 +71,7 @@ class Home(generic.TemplateView, LoginRequiredMixin):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         being_requested_list = user.being_friend_requested.order_by("username")
-        friend_list = user.friends.order_by("username")
+        friend_list = user.friends.filter(friend_relation__is_blocking=False).order_by("username")
         requesting_list = user.friend_requesting.order_by("username")
         context["being_requested_list"] = being_requested_list
         context["friend_list"] = friend_list

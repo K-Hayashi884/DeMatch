@@ -113,11 +113,6 @@ class User(AbstractUser):
     )
 
 
-class UserImg(models.Model):
-    img = models.ImageField(upload_to="user_images")
-    user = models.ForeignKey("User", on_delete=models.CASCADE)
-
-
 class UserFriendRelation(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_relation")
     friend = models.ForeignKey("User", on_delete=models.CASCADE, related_name="friend_relation")
