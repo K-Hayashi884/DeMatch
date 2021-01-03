@@ -9,7 +9,9 @@ from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-
+from .models import Talk
+import datetime  
+from django.db.models import OuterRef, Q, Subquery
 # groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
@@ -228,3 +230,50 @@ class BlockList(generic.TemplateView, LoginRequiredMixin):
         block_list = UserFriendRelation.objects.filter(user=user, is_blocking=True)
         context["block_list"] = block_list
         return context
+
+#チャットルームの表示
+def room(request, pk):
+    user = request.user
+    friend = User.objects.get(id=pk)
+    # 送信form
+    log = Talk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
+    params = {
+        'log':  log,
+        'room_name': pk,
+    }
+    return render(request, 'DeMatch/chatroom.html', params)
+
+@login_required
+def talk_list(request):
+    user = request.user
+   # ユーザーひとりずつの最新のトークを特定する
+    latest_msg = Talk.objects.filter(
+        Q(talk_from=OuterRef("pk"), talk_to=user) | Q(talk_from=user, talk_to=OuterRef("pk"))
+    ).order_by('-time')
+    # friends = User.objects.filter(friend_relation__is_blocking=False).annotate(
+    #     latest_msg_id=Subquery(
+    #          latest_msg.values("pk")[:1]
+    #     ),
+    #     latest_msg_content=Subquery(
+    #          latest_msg.values("text")[:1]
+    #     ),
+    #     latest_msg_pub_date=Subquery(
+    #          latest_msg.values("time")[:1]
+    #     ),
+    # ).order_by("-latest_msg_id")
+    friends = User.objects.exclude(id=user.id).annotate(
+       latest_msg_id=Subquery(
+           latest_msg.values("pk")[:1]
+       ),
+       latest_msg_content=Subquery(
+           latest_msg.values("text")[:1]
+       ),
+       latest_msg_pub_date=Subquery(
+           latest_msg.values("time")[:1]
+       ),
+   ).order_by("-latest_msg_id")
+    params = {
+        "user": user,
+        "friends": friends,
+    }
+    return render(request, "DeMatch/talk_list.html", params)

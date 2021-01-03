@@ -134,3 +134,14 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
+
+class Talk(models.Model):
+    text = models.TextField('テキスト', blank=True)
+    # 誰から
+    talk_from = models.ForeignKey(User, on_delete=models.CASCADE, related_name="talk_from")
+    # 誰に
+    talk_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="talk_to")
+    # 時間は
+    time = models.DateTimeField(null=True)
+    def __str__(self):
+        return "{}>>{}".format(self.talk_from, self.talk_to)

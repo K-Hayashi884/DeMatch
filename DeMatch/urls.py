@@ -25,4 +25,6 @@ urlpatterns = [
     path("create_group/", views.GroupCreateView.as_view(), name="create_group"),
     path("group_detail/<int:pk>/", views.GroupDetailView, name="group_detail"),
     path("group_update/<int:pk>/", views.GroupUpdateView.as_view(), name="group_update"),
+    path('DeMatch/<int:pk>/', views.room, name='room'),
+    path('talk_list/', views.talk_list, name="talk_list"),
 ]
