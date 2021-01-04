@@ -1,0 +1,6 @@
+<a href="{% url 'DeMatch:group_search' %}"> group_search</a>
+<form method='post' action='.'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type='submit'>submit</button>
+</form>

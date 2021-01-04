@@ -28,6 +28,14 @@ urlpatterns = [
     path("group_detail/<int:pk>/", views.GroupDetailView, name="group_detail"),
     #グループ更新ページ
     path("group_update/<int:pk>/", views.GroupUpdateView.as_view(), name="group_update"),
+    #検索ページ
+    path("account_search/", views.account_search, name="account_search"),
+    path("group_search/", views.group_search, name="group_search"),
+    #検索結果ページ
+    path("account_search_result/", views.account_search_result, name="account_search_result"),
+    path("group_search_reusult/", views.group_search_result, name="group_search_result"),
+    #おすすめ
+    path("recommended/", views.recommended, name="recommended"),
     #ユーザーとのトークルーム
     path('DeMatch/<int:pk>/', views.room, name='room'),
     path('talk_list/', views.talk_list, name="talk_list"),

@@ -1,17 +1,19 @@
 from django.shortcuts import render, redirect
-from .models import User, Hobby, Subject, UserFriendRelation, Group
+from .models import User, Hobby, Subject, UserFriendRelation, Group, Talk
 from .forms import (
     CreateGroupForm,
     InputProfileForm,
+    FindForm,
+    GroupFindForm,
 )
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .models import Talk
-import datetime  
 from django.db.models import OuterRef, Q, Subquery
+import datetime  
+
 # groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
@@ -78,9 +80,15 @@ class Home(generic.TemplateView, LoginRequiredMixin):
         being_requested_list = user.being_friend_requested.order_by("username")
         friend_list = user.friends.filter(friend_relation__is_blocking=False).order_by("username")
         requesting_list = user.friend_requesting.order_by("username")
+        being_invited_list = user.inviting_user.order_by("name")
+        requesting_group_list = user.applying_user.order_by("name")
+        group_list = user.group_member.order_by("name")
         context["being_requested_list"] = being_requested_list
         context["friend_list"] = friend_list
         context["requesting_list"] = requesting_list
+        context["being_invited_list"] = being_invited_list
+        context["requesting_group_list"] = requesting_group_list
+        context["group_list"] = group_list
         return context
 
 
@@ -233,6 +241,107 @@ class BlockList(generic.TemplateView, LoginRequiredMixin):
         block_list = UserFriendRelation.objects.filter(user=user, is_blocking=True)
         context["block_list"] = block_list
         return context
+
+#部分一致検索
+def orSearch(keyword, belong_to, hobby, subject):
+    pass
+
+
+@login_required
+def account_search(request):
+    form = FindForm()
+    #hobbyとsubjectの選択肢をDBから取得して追加
+    hobby_choices = Hobby.objects.all()
+    subject_choices = Subject.objects.all()
+
+    form.fields["hobby"].choices = hobby_choices
+    form.fields["subject"].choices = subject_choices
+    params = {
+        "form" : form,
+    }
+
+    if (request.method == 'POST'):
+        form = FindForm(request.POST)
+        keyword = request.POST['keyword']
+        grade = request.POST['grade']
+        belong_to = request.POST['belong_to']
+        hobby = request.POST.get('hobby')
+        subject  = request.POST.get('subject')
+        choice_method = request.POST['choice_method']
+        if (form.is_valid):
+            if (choice_method == "or"):
+                data = User.objects.filter(Q(username__icontains = keyword),Q(grade = grade)|
+                              Q(belong_to = belong_to)|Q(hobby = hobby)|Q(subject = subject)).order_by('last_login').reverse()
+            elif (choice_method == "and"):
+                data = User.objects.filter(username__icontains = keyword, grade = grade, 
+                              belong_to = belong_to, hobby = hobby, subject = subject).order_by('last_login').reverse()
+            params = {
+              'form' : FindForm(request.POST),
+              'data' : data,
+              'group_search' : 'group_search',
+            }
+
+
+        return render(request, "DeMatch/account_search_result.html", params)
+        
+    return render(request, "DeMatch/account_search.html", params) 
+
+
+@login_required
+def group_search(request):
+    form = GroupFindForm()
+    #hobbyとsubjectの選択肢をDBから取得して追加
+    hobby_choices = Hobby.objects.all()
+    subject_choices = Subject.objects.all()
+
+    form.fields["hobby"].choices = hobby_choices
+    form.fields["subject"].choices = subject_choices
+    params = {
+        "form" : form,
+    }
+
+    if (request.method == 'POST'):
+        form = GroupFindForm(request.POST)
+        keyword = request.POST['keyword']
+        hobby = request.POST.get('hobby')
+        subject  = request.POST.get('subject')
+        choice_method = request.POST['choice_method']
+        if (form.is_valid):
+            if (choice_method == "or"):
+                data = Group.objects.filter(Q(name__icontains = keyword),
+                                            Q(hobby = hobby)|Q(subject = subject))
+                #メッセージ最終受信時間で並び替え
+            elif (choice_method == "and"):
+                data = Group.objects.filter(name_icontains = keyword,
+                                            hobby = hobby, subject = subject)
+            params = {
+              'form' : GroupFindForm(request.POST),
+              'data' : data,
+              'account_search' : 'account_search',
+            }
+        return render(request, "DeMatch/group_search_result.html", params)
+
+    return render(request, "DeMatch/group_search.html", params) 
+
+
+@login_required
+def account_search_result(request):
+    return render(request, "DeMatch/account_search_result.html")
+
+@login_required
+def group_search_result(request):
+    return render(request, "DeMatch/group_search_result.html")
+
+
+#おすすめ
+@login_required
+def recommended(request):
+    user = request.user
+    data = Group.objects.filter(Q(hobby = user.hobby.name)|Q(subject = user.subject.name))
+    params = {
+      'data' : data,
+    }
+    return render(request, "DeMatch/recommended.html", params)
 
 #チャットルームの表示
 def room(request, pk):
