@@ -30,5 +30,7 @@ urlpatterns = [
     path("group_search/", views.group_search, name="group_search"),
     #検索結果ページ
     path("account_search_result/", views.account_search_result, name="account_search_result"),
-    path("group_search_reusult/", views.group_search_result, name="group_search_result")
+    path("group_search_reusult/", views.group_search_result, name="group_search_result"),
+    #おすすめ
+    path("recommended/", views.recommended, name="recommended"),
 ]

@@ -239,6 +239,8 @@ class BlockList(generic.TemplateView, LoginRequiredMixin):
 def orSearch(keyword, belong_to, hobby, subject):
     pass
 
+
+@login_required
 def account_search(request):
     form = FindForm()
     #hobbyとsubjectの選択肢をDBから取得して追加
@@ -262,10 +264,10 @@ def account_search(request):
         if (form.is_valid):
             if (choice_method == "or"):
                 data = User.objects.filter(Q(username__icontains = keyword)|Q(grade = grade)|
-                              Q(belong_to = belong_to)|Q(hobby = hobby)|Q(subject = subject))
+                              Q(belong_to = belong_to)|Q(hobby = hobby)|Q(subject = subject)).order_by('last_login').reverse()
             elif (choice_method == "and"):
                 data = User.objects.filter(username__icontains = keyword, grade = grade, 
-                              belong_to = belong_to, hobby = hobby, subject = subject)
+                              belong_to = belong_to, hobby = hobby, subject = subject).order_by('last_login').reverse()
             params = {
               'form' : FindForm(request.POST),
               'keyword' : keyword,
@@ -291,6 +293,7 @@ def account_search(request):
     return render(request, "DeMatch/account_search.html", params) #html追加
 
 
+@login_required
 def group_search(request):
     form = GroupFindForm()
     #hobbyとsubjectの選択肢をDBから取得して追加
@@ -345,3 +348,16 @@ def account_search_result(request):
 @login_required
 def group_search_result(request):
     return render(request, "DeMatch/group_search_result.html")
+
+
+#おすすめ
+@login_required
+def recommended(request):
+    user = request.user
+    data = Group.objects.filter(Q(hobby = user.hobby.name)|Q(subject = user.subject.name))
+    test = user.last_login
+    params = {
+      'data' : data,
+      'test' : test,
+    }
+    return render(request, "DeMatch/recommended.html", params)
