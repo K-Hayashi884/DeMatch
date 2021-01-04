@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "DeMatch",
     "imagekit",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "kyoudou_kaihatsu_A.wsgi.application"
+ASGI_APPLICATION = "kyoudou_kaihatsu_A.asgi.application"
 
 
 # Database
@@ -163,3 +165,13 @@ if DEBUG:
     DEBUG_TOOLBAR_CONFIG = {
         "SHOW_TOOLBAR_CALLBACK": show_toolbar,
     }
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
