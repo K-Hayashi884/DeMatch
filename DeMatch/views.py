@@ -16,13 +16,30 @@ from django.db.models import OuterRef, Q, Subquery
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
     template_name = "DeMatch/group_create.html"
-    form_class = CreateGroupForm
+    form_class = CreateGroupForm()
+
+    # def get_initial(self):
+    #     initial = super().get_initial()
+    #     user = self.request.user
+    #     # initial["inviting"].queryset = User.objects.filter(user=user).friends()
+    #     if user.friends:
+    #         self.fields["inviting"].queryset = user.friends
+    #     else:
+    #         self.fields["inviting"].queryset = None
+    #     return initial
+    # def get_form(self): 
+    #     form = super(GroupCreateView, self).get_form() 
+    #     user = self.request.user
+    #     self.fields["inviting"].queryset = User.objects.get(user=user).friends()
+    #     return form 
+
 
     def get_success_url(self):
         return reverse('DeMatch:group_detail', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
         group = form.save()
+        group.member_list.add(self.request.user)
         return super().form_valid(form)
 
     def form_invalid(self, form):

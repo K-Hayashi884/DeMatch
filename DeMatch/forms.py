@@ -17,7 +17,7 @@ class CreateGroupForm(forms.ModelForm):
     # def __init__(self, user, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     if user.friends():
-    #         self.fields["inviting"].queryset = User.objects.get(user=user).friends
+    #         self.fields["inviting"].queryset = User.objects.get(user=user).friends()
 
     def create(self):
         name = self.cleaned_data["name"]
