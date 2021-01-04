@@ -1,3 +1,6 @@
+{% extends 'DeMatch/base.html' %}
+
+{% block contents %}
 <a href="{% url 'DeMatch:user_detail'%}">{{ user }}</a><br>
 
 {% if being_invited_list %}
@@ -50,3 +53,5 @@
     {% endfor %}
 </ul>
 {% endif %}
+
+{% endblock %}

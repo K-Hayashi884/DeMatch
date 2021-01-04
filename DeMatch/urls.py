@@ -22,8 +22,11 @@ urlpatterns = [
     path("user_detail/", views.UserDetail.as_view(), name="user_detail"),
     # ブロックリスト
     path("block_list/", views.BlockList.as_view(), name="block_list"),
+    #グループ作成ぺージ
     path("create_group/", views.GroupCreateView.as_view(), name="create_group"),
+    #グループ詳細ページ
     path("group_detail/<int:pk>/", views.GroupDetailView, name="group_detail"),
+    #グループ更新ページ
     path("group_update/<int:pk>/", views.GroupUpdateView.as_view(), name="group_update"),
     #検索ページ
     path("account_search/", views.account_search, name="account_search"),
@@ -33,4 +36,7 @@ urlpatterns = [
     path("group_search_reusult/", views.group_search_result, name="group_search_result"),
     #おすすめ
     path("recommended/", views.recommended, name="recommended"),
+    #ユーザーとのトークルーム
+    path('DeMatch/<int:pk>/', views.room, name='room'),
+    path('talk_list/', views.talk_list, name="talk_list"),
 ]

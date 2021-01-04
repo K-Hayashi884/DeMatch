@@ -1,28 +1,31 @@
 from django.shortcuts import render, redirect
-from .models import User, Hobby, Subject, UserFriendRelation, Group
+from .models import User, Hobby, Subject, UserFriendRelation, Group, Talk
 from .forms import (
     CreateGroupForm,
     InputProfileForm,
     FindForm,
     GroupFindForm,
 )
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-
+from django.db.models import OuterRef, Q, Subquery
+import datetime  
 
 # groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
-    template_name = "group_create.html"
-    from_class = CreateGroupForm
-    success_url = reverse_lazy("group_detail")
+    template_name = "DeMatch/group_create.html"
+    form_class = CreateGroupForm()
+
+    def get_success_url(self):
+        return reverse('DeMatch:group_detail', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
         group = form.save()
+        group.member_list.add(self.request.user)
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -37,11 +40,11 @@ def GroupDetailView(request, pk):
     # htmlの表示を切り替える変数をここで設定
     # 他にいい方法がありそうなのであったら教えてください
     # condition 0はメンバー　1は招待中　2は申請中　3はどれでもない
-    if group.member_list.filter(User=request.user):
+    if group.member_list.filter(id=request.user.id):
         condition = 0
-    elif group.inviting.filter(User=request.user):
+    elif group.inviting.filter(id=request.user.id):
         condition = 1
-    elif group.applying.filter(User=request.user):
+    elif group.applying.filter(id=request.user.id):
         condition = 2
     else:
         condition = 3
@@ -53,7 +56,7 @@ def GroupDetailView(request, pk):
 # id一致で取得。id情報はurlに組み込む
 class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Group
-    template_name = "group_update.html"
+    template_name = "DeMatch/group_update.html"
     form_class = CreateGroupForm
 
     def get_success_url(self):
@@ -63,7 +66,7 @@ class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, "Groupの作成に失敗しました。")
+        messages.error(self.request, "Groupの更新に失敗しました。")
         return super().form_invalid(form)
 
 
@@ -239,8 +242,6 @@ class BlockList(generic.TemplateView, LoginRequiredMixin):
         context["block_list"] = block_list
         return context
 
-
-
 #部分一致検索
 def orSearch(keyword, belong_to, hobby, subject):
     pass
@@ -341,3 +342,39 @@ def recommended(request):
       'data' : data,
     }
     return render(request, "DeMatch/recommended.html", params)
+
+#チャットルームの表示
+def room(request, pk):
+    user = request.user
+    friend = User.objects.get(pk=pk)
+    # 送信form
+    log = Talk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
+    params = {
+        'log':  log,
+        'room_name': pk,
+    }
+    return render(request, 'DeMatch/chatroom.html', params)
+
+@login_required
+def talk_list(request):
+    user = request.user
+   # ユーザーひとりずつの最新のトークを特定する
+    latest_msg = Talk.objects.filter(
+        Q(talk_from=OuterRef("pk"), talk_to=user) | Q(talk_from=user, talk_to=OuterRef("pk"))
+    ).order_by('-time')
+    friends = User.objects.exclude(id=user.id).annotate(
+       latest_msg_id=Subquery(
+           latest_msg.values("pk")[:1]
+       ),
+       latest_msg_content=Subquery(
+           latest_msg.values("text")[:1]
+       ),
+       latest_msg_pub_date=Subquery(
+           latest_msg.values("time")[:1]
+       ),
+   ).order_by("-latest_msg_id")
+    params = {
+        "user": user,
+        "friends": friends,
+    }
+    return render(request, "DeMatch/talk_list.html", params)
