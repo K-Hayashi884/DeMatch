@@ -77,9 +77,15 @@ class Home(generic.TemplateView, LoginRequiredMixin):
         being_requested_list = user.being_friend_requested.order_by("username")
         friend_list = user.friends.filter(friend_relation__is_blocking=False).order_by("username")
         requesting_list = user.friend_requesting.order_by("username")
+        being_invited_list = user.inviting_user.order_by("name")
+        requesting_group_list = user.applying_user.order_by("name")
+        group_list = user.group_member.order_by("name")
         context["being_requested_list"] = being_requested_list
         context["friend_list"] = friend_list
         context["requesting_list"] = requesting_list
+        context["being_invited_list"] = being_invited_list
+        context["requesting_group_list"] = requesting_group_list
+        context["group_list"] = group_list
         return context
 
 
@@ -256,41 +262,28 @@ def account_search(request):
     if (request.method == 'POST'):
         form = FindForm(request.POST)
         keyword = request.POST['keyword']
-        grade = request.POST['grade'] #MultiChoiceFieldが送ってくるのはなんやろ、listかな？
-        belong_to = request.POST['belong_to'] #これは一つ、B1とかがくんのかな？
+        grade = request.POST['grade']
+        belong_to = request.POST['belong_to']
         hobby = request.POST.get('hobby')
         subject  = request.POST.get('subject')
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
-                data = User.objects.filter(Q(username__icontains = keyword)|Q(grade = grade)|
+                data = User.objects.filter(Q(username__icontains = keyword),Q(grade = grade)|
                               Q(belong_to = belong_to)|Q(hobby = hobby)|Q(subject = subject)).order_by('last_login').reverse()
             elif (choice_method == "and"):
                 data = User.objects.filter(username__icontains = keyword, grade = grade, 
                               belong_to = belong_to, hobby = hobby, subject = subject).order_by('last_login').reverse()
             params = {
               'form' : FindForm(request.POST),
-              'keyword' : keyword,
-              'grade' : grade,
-              'belong_to' : belong_to,
-              'hobby' : hobby,
-              'subject' : subject,
-              'choice_method' : choice_method,
               'data' : data,
               'group_search' : 'group_search',
             }
 
 
         return render(request, "DeMatch/account_search_result.html", params)
-        #if ():    form内容が正しければ（keywordが入力されてたら）
-            #return render(request, , params)
-
-    else:
-        form = FindForm()
-        #ifの上でこの処理やったらelseはいらんかも
-        #この処理ってのはhobbyとsubjectの選択肢を動的に追加すること
-
-    return render(request, "DeMatch/account_search.html", params) #html追加
+        
+    return render(request, "DeMatch/account_search.html", params) 
 
 
 @login_required
@@ -314,31 +307,20 @@ def group_search(request):
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
-                data = Group.objects.filter(Q(name__icontains = keyword)|
+                data = Group.objects.filter(Q(name__icontains = keyword),
                                             Q(hobby = hobby)|Q(subject = subject))
+                #メッセージ最終受信時間で並び替え
             elif (choice_method == "and"):
                 data = Group.objects.filter(name_icontains = keyword,
                                             hobby = hobby, subject = subject)
             params = {
               'form' : GroupFindForm(request.POST),
-              'keyword' : keyword,
-              'hobby' : hobby,
-              'subject' : subject,
-              'choice_method' : choice_method,
               'data' : data,
               'account_search' : 'account_search',
             }
         return render(request, "DeMatch/group_search_result.html", params)
 
-        #if ():    form内容が正しければ（keywordが入力されてたら）
-            #return render(request, , params)
-
-    else:
-        form = GroupFindForm()
-        #ifの上でこの処理やったらelseはいらんかも
-        #この処理ってのはhobbyとsubjectの選択肢を動的に追加すること
-
-    return render(request, "DeMatch/group_search.html", params) #html追加
+    return render(request, "DeMatch/group_search.html", params) 
 
 
 @login_required
@@ -355,9 +337,7 @@ def group_search_result(request):
 def recommended(request):
     user = request.user
     data = Group.objects.filter(Q(hobby = user.hobby.name)|Q(subject = user.subject.name))
-    test = user.last_login
     params = {
       'data' : data,
-      'test' : test,
     }
     return render(request, "DeMatch/recommended.html", params)

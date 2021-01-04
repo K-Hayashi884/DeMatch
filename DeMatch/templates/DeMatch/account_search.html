@@ -3,15 +3,4 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type='submit'>submit</button>
-
-    {{ keyword }}
-    {{ grade }}
-    {{ belong_to }}
-    {{ hobby }}
-    {{ subject }}
-    {{ choice_method }}
-
-    {% for account in data %}
-        {{ account.username }}
-    {% endfor %}
 </form>
