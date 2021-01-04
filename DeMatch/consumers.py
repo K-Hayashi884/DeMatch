@@ -37,23 +37,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': message,
+                'user_id':self.user.id
             }
         )
 
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
-        user_id = self.user.id
-        await self._save_message(message)
+        user_id = event['user_id']
+        # user_id = self.user.id
+        username = await self._save_message(message, user_id)
         await self.send(text_data=json.dumps({
             'message': message,
-            'user_id':user_id,
+            'username': username,
         }))
 
     # DB操作を伴う処理を含んだメソッド
     @database_sync_to_async
-    def _save_message(self, text):
-        talk_from = self.user
+    def _save_message(self, text, user_id):
+        talk_from = User.objects.get(id=user_id)
         talk_to = User.objects.get(id=self.room_name)
         new_talk = Talk(text=text, talk_from=talk_from, talk_to=talk_to, time=datetime.datetime.now(),)
         new_talk.save()
+        return talk_from.username

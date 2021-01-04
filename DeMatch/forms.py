@@ -11,7 +11,6 @@ class CreateGroupForm(forms.ModelForm):
             "hobby",
             "subject",
             "introduction",
-            "inviting",
         )
         
     # def __init__(self, user, *args, **kwargs):

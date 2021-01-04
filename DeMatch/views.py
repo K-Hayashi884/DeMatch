@@ -18,22 +18,6 @@ class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = "DeMatch/group_create.html"
     form_class = CreateGroupForm()
 
-    # def get_initial(self):
-    #     initial = super().get_initial()
-    #     user = self.request.user
-    #     # initial["inviting"].queryset = User.objects.filter(user=user).friends()
-    #     if user.friends:
-    #         self.fields["inviting"].queryset = user.friends
-    #     else:
-    #         self.fields["inviting"].queryset = None
-    #     return initial
-    # def get_form(self): 
-    #     form = super(GroupCreateView, self).get_form() 
-    #     user = self.request.user
-    #     self.fields["inviting"].queryset = User.objects.get(user=user).friends()
-    #     return form 
-
-
     def get_success_url(self):
         return reverse('DeMatch:group_detail', kwargs={'pk': self.object.id})
 
@@ -253,7 +237,7 @@ class BlockList(generic.TemplateView, LoginRequiredMixin):
 #チャットルームの表示
 def room(request, pk):
     user = request.user
-    friend = User.objects.get(id=pk)
+    friend = User.objects.get(pk=pk)
     # 送信form
     log = Talk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
     params = {
@@ -269,17 +253,6 @@ def talk_list(request):
     latest_msg = Talk.objects.filter(
         Q(talk_from=OuterRef("pk"), talk_to=user) | Q(talk_from=user, talk_to=OuterRef("pk"))
     ).order_by('-time')
-    # friends = User.objects.filter(friend_relation__is_blocking=False).annotate(
-    #     latest_msg_id=Subquery(
-    #          latest_msg.values("pk")[:1]
-    #     ),
-    #     latest_msg_content=Subquery(
-    #          latest_msg.values("text")[:1]
-    #     ),
-    #     latest_msg_pub_date=Subquery(
-    #          latest_msg.values("time")[:1]
-    #     ),
-    # ).order_by("-latest_msg_id")
     friends = User.objects.exclude(id=user.id).annotate(
        latest_msg_id=Subquery(
            latest_msg.values("pk")[:1]
