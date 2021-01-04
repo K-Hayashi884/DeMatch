@@ -5,19 +5,19 @@ from .models import User, Group, Hobby, Subject
 class CreateGroupForm(forms.ModelForm):
     class Meta:
         model = Group
-        fields = [
+        fields = (
             "name",
             "image",
             "hobby",
             "subject",
             "introduction",
             "inviting",
-        ]
+        )
         
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if user.friends():
-            self.fields["inviting"].queryset = User.objects.get(user=user).friends
+    # def __init__(self, user, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     if user.friends():
+    #         self.fields["inviting"].queryset = User.objects.get(user=user).friends
 
     def create(self):
         name = self.cleaned_data["name"]

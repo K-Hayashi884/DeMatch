@@ -125,8 +125,8 @@ class Group(models.Model):
     image = models.ImageField(
         blank=True, null=True, verbose_name="group_image", upload_to="group_images"
     )
-    hobby = models.ManyToManyField(Hobby, related_name="hobby_group")
-    subject = models.ManyToManyField(Subject, related_name="subject_group")
+    hobby = models.ManyToManyField(Hobby, related_name="hobby_group", blank=True)
+    subject = models.ManyToManyField(Subject, related_name="subject_group", blank=True)
     introduction = models.TextField(max_length=200, blank=True, null=True)
     member_list = models.ManyToManyField(User, related_name="group_member")
     inviting = models.ManyToManyField(User, related_name="inviting_user")

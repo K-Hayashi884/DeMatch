@@ -51,7 +51,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # DB操作を伴う処理を含んだメソッド
     @database_sync_to_async
     def _save_message(self, text):
-        # talk_from = User.objects.get(id=1)
         talk_from = self.user
         talk_to = User.objects.get(id=self.room_name)
         new_talk = Talk(text=text, talk_from=talk_from, talk_to=talk_to, time=datetime.datetime.now(),)

@@ -10,6 +10,7 @@
 <body>
     <div id="box">
         {% for log in log %}
+        <p class="friend">{{ log.talk_from }}</p>
         <p class="msg">{{ log.text }}</p>
         {% endfor %}
     </div>
@@ -30,6 +31,7 @@
         // メッセージを受け取ったときに非同期で画面に表示する操作
         chatSocket.onmessage = function (e) {
             const data = JSON.parse(e.data);
+            console.log(e)
             var newElement = document.createElement("p");
             var newContent = document.createTextNode(data.message);
             newElement.appendChild(newContent);

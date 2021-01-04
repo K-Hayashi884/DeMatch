@@ -4,7 +4,7 @@ from .forms import (
     CreateGroupForm,
     InputProfileForm,
 )
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -15,9 +15,11 @@ from django.db.models import OuterRef, Q, Subquery
 # groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
-    template_name = "group_create.html"
-    from_class = CreateGroupForm
-    success_url = reverse_lazy("group_detail")
+    template_name = "DeMatch/group_create.html"
+    form_class = CreateGroupForm
+
+    def get_success_url(self):
+        return reverse('DeMatch:group_detail', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
         group = form.save()
@@ -35,11 +37,11 @@ def GroupDetailView(request, pk):
     # htmlの表示を切り替える変数をここで設定
     # 他にいい方法がありそうなのであったら教えてください
     # condition 0はメンバー　1は招待中　2は申請中　3はどれでもない
-    if group.member_list.filter(User=request.user):
+    if group.member_list.filter(id=request.user.id):
         condition = 0
-    elif group.inviting.filter(User=request.user):
+    elif group.inviting.filter(id=request.user.id):
         condition = 1
-    elif group.applying.filter(User=request.user):
+    elif group.applying.filter(id=request.user.id):
         condition = 2
     else:
         condition = 3
@@ -51,7 +53,7 @@ def GroupDetailView(request, pk):
 # id一致で取得。id情報はurlに組み込む
 class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Group
-    template_name = "group_update.html"
+    template_name = "DeMatch/group_update.html"
     form_class = CreateGroupForm
 
     def get_success_url(self):
@@ -61,7 +63,7 @@ class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, "Groupの作成に失敗しました。")
+        messages.error(self.request, "Groupの更新に失敗しました。")
         return super().form_invalid(form)
 
 
