@@ -1,0 +1,17 @@
+<a href="{% url 'DeMatch:group_search' %}"> group_search</a>
+<form method='post' action='.'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type='submit'>submit</button>
+
+    {{ keyword }}
+    {{ grade }}
+    {{ belong_to }}
+    {{ hobby }}
+    {{ subject }}
+    {{ choice_method }}
+
+    {% for account in data %}
+        {{ account.username }}
+    {% endfor %}
+</form>

@@ -25,4 +25,10 @@ urlpatterns = [
     path("create_group/", views.GroupCreateView.as_view(), name="create_group"),
     path("group_detail/<int:pk>/", views.GroupDetailView, name="group_detail"),
     path("group_update/<int:pk>/", views.GroupUpdateView.as_view(), name="group_update"),
+    #検索ページ
+    path("account_search/", views.account_search, name="account_search"),
+    path("group_search/", views.group_search, name="group_search"),
+    #検索結果ページ
+    path("account_search_result/", views.account_search_result, name="account_search_result"),
+    path("group_search_reusult/", views.group_search_result, name="group_search_result")
 ]
