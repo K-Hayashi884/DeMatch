@@ -1,5 +1,6 @@
 from django import forms
 from .models import User, Group, Hobby, Subject
+from django.forms.fields import ChoiceField
 
 
 class CreateGroupForm(forms.ModelForm):
@@ -11,12 +12,19 @@ class CreateGroupForm(forms.ModelForm):
             "hobby",
             "subject",
             "introduction",
+            "inviting",
         )
         
-    # def __init__(self, user, *args, **kwargs):
+    # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
-    #     if user.friends():
-    #         self.fields["inviting"].queryset = User.objects.get(user=user).friends()
+    #     user = kwargs.pop('user')
+    #     if user.friends:
+    #         self.fields["inviting"].queryset = user.friends
+    #     else:
+    #         CHOICE_LIST = [
+    #             ('', '----'),
+    #         ]
+    #         self.fields["inviting"].queryset =ChoiceField(choices=CHOICE_LIST, required=False)
 
     def create(self):
         name = self.cleaned_data["name"]

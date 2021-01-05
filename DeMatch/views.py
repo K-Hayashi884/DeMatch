@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import User, Hobby, Subject, UserFriendRelation, Group, Talk
+from .models import User, Hobby, Subject, UserFriendRelation, Group, Talk, UserTalk, GroupTalk
 from .forms import (
     CreateGroupForm,
     InputProfileForm,
@@ -14,11 +14,16 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Q, Subquery
 import datetime  
 
-# groupの作成
+#groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
     template_name = "DeMatch/group_create.html"
     form_class = CreateGroupForm()
+
+    def get_form_kwargs(self):
+        kwargs = super(GroupCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse('DeMatch:group_detail', kwargs={'pk': self.object.id})
@@ -31,6 +36,7 @@ class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     def form_invalid(self, form):
         messages.error(self.request, "Groupの作成に失敗しました。")
         return super().form_invalid(form)
+
 
 
 # groupの詳細
@@ -348,12 +354,24 @@ def room(request, pk):
     user = request.user
     friend = User.objects.get(pk=pk)
     # 送信form
-    log = Talk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
+    log = UserTalk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
     params = {
         'log':  log,
         'room_name': pk,
     }
     return render(request, 'DeMatch/chatroom.html', params)
+
+#グループチャットルームの表示
+def group_room(request, pk):
+    user = request.user
+    group = Group.objects.get(pk=pk)
+    # 送信form
+    log = GroupTalk.objects.filter(talk_to=group)
+    params = {
+        'log':  log,
+        'room_name': pk,
+    }
+    return render(request, 'DeMatch/group_chatroom.html', params)
 
 @login_required
 def talk_list(request):

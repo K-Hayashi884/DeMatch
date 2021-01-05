@@ -141,20 +141,18 @@ class Group(models.Model):
 class Talk(models.Model):
     text = models.TextField('テキスト', blank=True)
     # 誰に
-    talk_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="talk_to")
+    talk_from = models.ForeignKey(User, on_delete=models.CASCADE, related_name="talk_from")
     # 時間は
     time = models.DateTimeField(null=True)
-    def __str__(self):
-        return "{}>>{}".format(self.talk_from, self.talk_to)
 
 class UserTalk(Talk):
     # 誰から
-    talk_from = models.ForeignKey(User, on_delete=models.CASCADE, related_name="talk_from")
+    talk_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="talk_to")
     def __str__(self):
         return "{}>>{}".format(self.talk_from, self.talk_to)
 
 class GroupTalk(Talk):
     # 誰から
-    talk_from = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="talk_from")
+    talk_to = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="talk_to")
     def __str__(self):
         return "{}>>{}".format(self.talk_from, self.talk_to)
