@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import User, Hobby, Subject, UserFriendRelation, Group, Talk
+from .models import User, Hobby, Subject, UserFriendRelation, Group, Talk, UserTalk, GroupTalk
 from .forms import (
     CreateGroupForm,
     InputProfileForm,
@@ -13,12 +13,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Q, Subquery
 import datetime  
+from django.http import HttpResponseRedirect
 
-# groupの作成
+#groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
     template_name = "DeMatch/group_create.html"
     form_class = CreateGroupForm()
+
+    def get_form_kwargs(self):
+        kwargs = super(GroupCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse('DeMatch:group_detail', kwargs={'pk': self.object.id})
@@ -33,22 +39,45 @@ class GroupCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_invalid(form)
 
 
+
 # groupの詳細
 # id一致で取得。id情報はurlに組み込む
 def GroupDetailView(request, pk):
-    group = Group.objects.get(id=pk)
+    group = Group.objects.get(pk=pk)
+    user = request.user
+    member_list = group.member_list
+    inviting = group.inviting
+    applying = group.applying
+    if request.method == "GET":
     # htmlの表示を切り替える変数をここで設定
     # 他にいい方法がありそうなのであったら教えてください
     # condition 0はメンバー　1は招待中　2は申請中　3はどれでもない
-    if group.member_list.filter(id=request.user.id):
-        condition = 0
-    elif group.inviting.filter(id=request.user.id):
-        condition = 1
-    elif group.applying.filter(id=request.user.id):
-        condition = 2
-    else:
-        condition = 3
-    params = {"group": group, "condition": condition}
+        if member_list.filter(id=request.user.id):
+            condition = 0
+        elif inviting.filter(id=request.user.id):
+            condition = 1
+        elif applying.filter(id=request.user.id):
+            condition = 2
+        else:
+            condition = 3
+        params = {"group": group, "condition": condition}
+    if request.method == "POST":
+        if 'button_0' in request.POST:
+            return HttpResponseRedirect(
+        reverse('DeMatch:group_update', kwargs={"pk": pk}))
+        if 'button_1' in request.POST:
+            condition = 0
+            inviting.remove(user)
+            member_list.add(user)
+        elif 'button_2' in request.POST:
+            condition = 3
+        elif 'button_3' in request.POST:
+            condition = 3
+            applying.remove(user)
+        elif 'button_4' in request.POST:
+            condition = 2
+            applying.add(user)
+        params = {"group": group, "condition": condition}
     return render(request, "DeMatch/group_detail.html", params)
 
 
@@ -60,7 +89,7 @@ class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
     form_class = CreateGroupForm
 
     def get_success_url(self):
-        return reverse_lazy("group_detail", kwargs={"pk": self.kwargs["pk"]})
+        return reverse_lazy("DeMatch:group_detail", kwargs={"pk": self.kwargs["pk"]})
 
     def form_valid(self, form):
         return super().form_valid(form)
@@ -348,12 +377,24 @@ def room(request, pk):
     user = request.user
     friend = User.objects.get(pk=pk)
     # 送信form
-    log = Talk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
+    log = UserTalk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
     params = {
         'log':  log,
         'room_name': pk,
     }
     return render(request, 'DeMatch/chatroom.html', params)
+
+#グループチャットルームの表示
+def group_room(request, pk):
+    user = request.user
+    group = Group.objects.get(pk=pk)
+    # 送信form
+    log = GroupTalk.objects.filter(talk_to=group)
+    params = {
+        'log':  log,
+        'room_name': pk,
+    }
+    return render(request, 'DeMatch/group_chatroom.html', params)
 
 @login_required
 def talk_list(request):
