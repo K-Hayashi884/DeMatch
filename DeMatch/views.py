@@ -19,11 +19,12 @@ from django.http import HttpResponseRedirect
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
     model = Group
     template_name = "DeMatch/group_create.html"
-    form_class = CreateGroupForm()
+    form_class = CreateGroupForm
 
     def get_form_kwargs(self):
-        kwargs = super(GroupCreateView, self).get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        print(self.request.user)
         return kwargs
 
     def get_success_url(self):
@@ -86,17 +87,11 @@ def GroupDetailView(request, pk):
 class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Group
     template_name = "DeMatch/group_update.html"
-    form_class = CreateGroupForm
+    fields = ['name', 'image', 'hobby', 'subject', 'introduction']
 
     def get_success_url(self):
         return reverse_lazy("DeMatch:group_detail", kwargs={"pk": self.kwargs["pk"]})
 
-    def form_valid(self, form):
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        messages.error(self.request, "Groupの更新に失敗しました。")
-        return super().form_invalid(form)
 
 
 # ホーム画面
