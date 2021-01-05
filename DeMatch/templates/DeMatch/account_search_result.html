@@ -1,6 +1,6 @@
 {% for item in data %}
-
+<a href="{% url 'DeMatch:friend_detail' item.pk %}">
 <img src="" > 
 {{ item.username }}
-
+</a>
 {% endfor %}
