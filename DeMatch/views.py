@@ -397,10 +397,10 @@ def group_room(request, pk):
     return render(request, 'DeMatch/group_chatroom.html', params)
 
 @login_required
-def talk_list(request):
+def user_talk_list(request):
     user = request.user
    # ユーザーひとりずつの最新のトークを特定する
-    latest_msg = Talk.objects.filter(
+    latest_msg = UserTalk.objects.filter(
         Q(talk_from=OuterRef("pk"), talk_to=user) | Q(talk_from=user, talk_to=OuterRef("pk"))
     ).order_by('-time')
     friends = User.objects.exclude(id=user.id).annotate(
@@ -413,9 +413,33 @@ def talk_list(request):
        latest_msg_pub_date=Subquery(
            latest_msg.values("time")[:1]
        ),
-   ).order_by("-latest_msg_id")
+    ).order_by("-latest_msg_id")
     params = {
         "user": user,
         "friends": friends,
     }
-    return render(request, "DeMatch/talk_list.html", params)
+    return render(request, "DeMatch/user_talk_list.html", params)
+
+
+@login_required
+def group_talk_list(request):
+    user = request.user
+    latest_msg = GroupTalk.objects.filter(
+      talk_to=OuterRef("pk")
+    ).order_by('-time')
+    groups = Group.objects.filter(member_list=user).annotate(
+        latest_msg_id=Subquery(
+            latest_msg.values("pk")[:1]
+        ),
+        latest_msg_content=Subquery(
+            latest_msg.values("text")[:1]
+        ),
+        latest_msg_pub_date=Subquery(
+            latest_msg.values("time")[:1]
+        ),
+    ).order_by("-latest_msg_id")
+    params = {
+        "user" : user,
+        "groups" : groups,
+    }
+    return render(request, "DeMatch/group_talk_list.html", params)

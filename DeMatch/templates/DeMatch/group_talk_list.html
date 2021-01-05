@@ -1,0 +1,12 @@
+
+<a href="{% url 'DeMatch:user_talk_list' %}">user_talk_list</a>
+
+
+
+{% for group in groups %}
+
+<a href="{% url 'DeMatch:group_room' group.pk %}">{{ group.name }}</a>
+
+
+
+{% endfor %}

@@ -41,5 +41,6 @@ urlpatterns = [
     path('DeMatch/User/<int:pk>/', views.room, name='room'),
     #グループとのトークルーム
     path('DeMatch/Group/<int:pk>/', views.group_room, name='group_room'),
-    path('talk_list/', views.talk_list, name="talk_list"),
+    path('talk_list/', views.user_talk_list, name="user_talk_list"),
+    path("group_list/", views.group_talk_list, name="group_talk_list"),
 ]
