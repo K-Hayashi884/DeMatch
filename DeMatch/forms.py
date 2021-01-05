@@ -14,17 +14,15 @@ class CreateGroupForm(forms.ModelForm):
             "introduction",
             "inviting",
         )
+        widgets = {
+            "hobby": forms.CheckboxSelectMultiple(),
+            "subject": forms.CheckboxSelectMultiple(),
+            "inviting": forms.CheckboxSelectMultiple(),
+        }
         
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     user = kwargs.pop('user')
-    #     if user.friends:
-    #         self.fields["inviting"].queryset = user.friends
-    #     else:
-    #         CHOICE_LIST = [
-    #             ('', '----'),
-    #         ]
-    #         self.fields["inviting"].queryset =ChoiceField(choices=CHOICE_LIST, required=False)
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["inviting"].queryset = user.friends.filter(friend_relation__is_blocking=False)
 
     def create(self):
         name = self.cleaned_data["name"]

@@ -23,8 +23,7 @@ urlpatterns = [
     # ブロックリスト
     path("block_list/", views.BlockList.as_view(), name="block_list"),
     #グループ作成ぺージ
-    # path("create_group/", views.GroupCreateView.as_view(), name="create_group"),
-    path("create_group/", views.GroupCreateView, name="create_group"),
+    path("create_group/", views.GroupCreateView.as_view(), name="create_group"),
     #グループ詳細ページ
     path("group_detail/<int:pk>/", views.GroupDetailView, name="group_detail"),
     #グループ更新ページ
