@@ -4,24 +4,74 @@
 {% block contents %}
 
 <div class="container">
-    { object.image }
+    {{ group.image }}
+</div>
+
+<div>
+    {{ group.name }}
+</div>
+<div>
+    {{ group.introduction }}
+</div>
+<div>
+    {% for hobby in group.hobby.all %}
+        {{ hobby.name }}
+    {% endfor %}
+</div>
+<div>
+    {% for subject in group.subject.all %}
+        {{ subject.name }}
+    {% endfor %}
+</div>
+
+
+<div>
+    
+    {% for inviting in group.inviting.all %}
+    {{ inviting.username }}
+    {{ inviting.id }}
+    {% endfor %}
+</div>
+
+<div>
+    {% for applying in group.applying.all %}
+    {{ applying.username }}
+    {% endfor %}
 </div>
 
 <!-- 申請前、申請中、招待中、参加後の表示の変化はhtml内で記述 -->
 {% if condition == 0 %}
-0
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="button_0" value="編集"> 
+</form>
 {% endif %}
 
+
+
 {% if condition == 1 %}
-1
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="button_1" value="参加する"> 
+</form>
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="button_2" value="参加しない"> 
+</form>
 {% endif %}
 
 {% if condition == 2 %}
-2
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="button_3" value="申請キャンセル"> 
+</form>
 {% endif %}
 
 {% if condition == 3 %}
-3
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="button_4" value="参加申請"> 
+</form>
 {% endif %}
 
 {% endblock %}
