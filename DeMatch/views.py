@@ -86,7 +86,7 @@ def GroupDetailView(request, pk):
             member_list.remove(user)
             if member_list:
                 group.delete()
-        return HttpResponseRedirect(
+            return HttpResponseRedirect(
         reverse(Home))
         params = {"group": group, "condition": condition}
     return render(request, "DeMatch/group_detail.html", params)
@@ -134,7 +134,7 @@ class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 
 # ホーム画面
-class Home(generic.TemplateView, LoginRequiredMixin):
+class Home(LoginRequiredMixin, generic.TemplateView):
     template_name = "DeMatch/home.html"
 
     def get_context_data(self, **kwargs):
@@ -224,7 +224,7 @@ def cropping(request, img_name):
     return render(request, "DeMatch/cropping.html", params)
 
 
-class FriendDetail(generic.DetailView, LoginRequiredMixin):
+class FriendDetail(LoginRequiredMixin, generic.DetailView):
     template_name = "DeMatch/friend_detail.html"
     model = User
 
@@ -291,11 +291,11 @@ def block(request, pk):
     return redirect(to=("../../friend_detail/" + str(pk)))
 
 
-class UserDetail(generic.TemplateView, LoginRequiredMixin):
+class UserDetail(LoginRequiredMixin, generic.TemplateView):
     template_name = "DeMatch/user_detail.html"
 
 
-class BlockList(generic.TemplateView, LoginRequiredMixin):
+class BlockList(LoginRequiredMixin, generic.TemplateView):
     template_name = "DeMatch/block_list.html"
 
     def get_context_data(self, **kwargs):
