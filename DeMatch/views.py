@@ -281,10 +281,11 @@ def account_search(request):
     form = FindForm()
     #hobbyとsubjectの選択肢をDBから取得して追加
     hobby_choices = Hobby.objects.all()
+    #subject_choices = [(i.naem, i.name) for i in Subject.objects.all()]
     subject_choices = Subject.objects.all()
 
-    form.fields["hobby"].choices = hobby_choices
-    form.fields["subject"].choices = subject_choices
+    form.fields["hobby"].queryset = hobby_choices
+    form.fields["subject"].queryset = subject_choices
     params = {
         "form" : form,
     }
@@ -292,18 +293,25 @@ def account_search(request):
     if (request.method == 'POST'):
         form = FindForm(request.POST)
         keyword = request.POST['keyword']
-        grade = request.POST['grade']
-        belong_to = request.POST['belong_to']
-        hobby = request.POST.get('hobby')
-        subject  = request.POST.get('subject')
+        grade = request.POST.getlist('grade')
+        belong_to = request.POST.getlist('belong_to')
+        hobby = request.POST.getlist('hobby')
+        print(grade)
+        print(belong_to)
+        print(hobby)
+        subject  = request.POST.getlist('subject')
+        print(subject)
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
+                print("aaaaaaaaaaaaaaaaaaaaa")
                 data = User.objects.filter(Q(username__icontains = keyword),Q(grade = grade)|
-                              Q(belong_to = belong_to)|Q(hobby = hobby)|Q(subject = subject)).order_by('last_login').reverse()
+                              Q(belong_to = belong_to)|Q(hobby__in = hobby)|Q(subject__in = subject)).order_by('last_login').reverse()
+                print("bbbbbbbbbbbbbbbbb")
             elif (choice_method == "and"):
                 data = User.objects.filter(username__icontains = keyword, grade = grade, 
                               belong_to = belong_to, hobby = hobby, subject = subject).order_by('last_login').reverse()
+            print(subject)
             params = {
               'form' : FindForm(request.POST),
               'data' : data,
@@ -322,9 +330,10 @@ def group_search(request):
     #hobbyとsubjectの選択肢をDBから取得して追加
     hobby_choices = Hobby.objects.all()
     subject_choices = Subject.objects.all()
+    print(hobby_choices)
 
-    form.fields["hobby"].choices = hobby_choices
-    form.fields["subject"].choices = subject_choices
+    form.fields["hobby"].queryset = hobby_choices
+    form.fields["subject"].queryset = subject_choices
     params = {
         "form" : form,
     }
@@ -332,17 +341,17 @@ def group_search(request):
     if (request.method == 'POST'):
         form = GroupFindForm(request.POST)
         keyword = request.POST['keyword']
-        hobby = request.POST.get('hobby')
-        subject  = request.POST.get('subject')
+        hobby = request.POST.getlist('hobby')
+        subject  = request.POST.getlist('subject')
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
                 data = Group.objects.filter(Q(name__icontains = keyword),
-                                            Q(hobby = hobby)|Q(subject = subject))
+                                            Q(hobby__in = hobby)|Q(subject__in = subject))
                 #メッセージ最終受信時間で並び替え
             elif (choice_method == "and"):
                 data = Group.objects.filter(name_icontains = keyword,
-                                            hobby = hobby, subject = subject)
+                                            hobby__in = hobby, subject__in = subject)
             params = {
               'form' : GroupFindForm(request.POST),
               'data' : data,

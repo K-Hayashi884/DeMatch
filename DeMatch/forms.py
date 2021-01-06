@@ -70,7 +70,7 @@ class InputProfileForm(forms.ModelForm):
 #検索フォーム
 class FindForm(forms.Form):
     keyword = forms.CharField(required=True, label='keyword') #検索キーワード
-    grade = forms.MultipleChoiceField(label='grade', 
+    grade = forms.MultipleChoiceField(label='grade', widget=forms.CheckboxSelectMultiple,
         choices=[
                   ("B1", "学部１回生"),
                   ("B2", "学部２回生"),
@@ -84,7 +84,7 @@ class FindForm(forms.Form):
                   ("D4", "博士４回生"),
                   ("D5", "博士５回生"),
                 ]) #学年
-    belong_to = forms.ChoiceField(label='belong_to', 
+    belong_to = forms.ChoiceField(label='belong_to', widget=forms.CheckboxSelectMultiple,
         choices=[
                   ("H", "総合人間学部"),
                   ("L", "文学部"),
@@ -108,8 +108,8 @@ class FindForm(forms.Form):
                   ("Af", "農学部｜食品生物学科"),
                   ("Ph", "薬学部"),
                 ]) #学部・学科
-    hobby = forms.MultipleChoiceField(label='hobby', required=False) #趣味
-    subject = forms.MultipleChoiceField(label='subjectField', required=False) #勉強分野
+    hobby = forms.ModelMultipleChoiceField(label='hobby', queryset=None, required=False, widget=forms.CheckboxSelectMultiple) #趣味
+    subject = forms.ModelMultipleChoiceField(label='subjectField', queryset=None, required=False, widget=forms.CheckboxSelectMultiple) #勉強分野
     choice_method = forms.ChoiceField(label='choiceMethod', 
         choices=[
             ('or', '部分一致'),
@@ -123,10 +123,11 @@ class FindForm(forms.Form):
 class GroupFindForm(forms.Form):
     keyword = forms.CharField(required=True, label='keyword') #検索キーワード
     
-    hobby = forms.MultipleChoiceField(label='hobby', required=False) #趣味
-    subject = forms.MultipleChoiceField(label='subjectField', required=False) #勉強分野
+    hobby = forms.ModelMultipleChoiceField(label='hobby', queryset=None, required=False, widget=forms.CheckboxSelectMultiple) #趣味
+    subject = forms.ModelMultipleChoiceField(label='subjectField', queryset=None, required=False, widget=forms.CheckboxSelectMultiple) #勉強分野
     choice_method = forms.ChoiceField(label='choiceMethod', 
         choices=[
             ('or', '部分一致'),
             ('and', '完全一致'),
-                ]) #検索条件
+                ]
+                , widget=forms.CheckboxSelectMultiple) #検索条件
