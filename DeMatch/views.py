@@ -378,11 +378,38 @@ def group_search(request):
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
+                latest_msg = GroupTalk.objects.filter(
+                    talk_from=OuterRef("pk") 
+                ).order_by('time')
                 data = Group.objects.filter(Q(name__icontains = keyword),
-                                            Q(hobby__in = hobby)|Q(subject__in = subject)).distinct()
+                                            Q(hobby__in = hobby)|Q(subject__in = subject)).distinct().annotate(
+                    latest_msg_id=Subquery(
+                        latest_msg.values("pk")[:1]
+                    ),
+                    latest_msg_content=Subquery(
+                        latest_msg.values("text")[:1]
+                    ), #これはなしでもいい
+                    latest_msg_pub_date=Subquery(
+                        latest_msg.values("time")[:1]
+                    ), #これはなしでもいい
+                ).order_by("-latest_msg_id")
                 #メッセージ最終受信時間で並び替え
             elif (choice_method == "and"):
-                data = Group.objects.filter(name__icontains = keyword).distinct()
+                latest_msg = GroupTalk.objects.filter(
+                    talk_from=OuterRef("pk") 
+                ).order_by('-time')
+                data = Group.objects.filter(name__icontains = keyword).distinct().annotate(
+                    latest_msg_id=Subquery(
+                        latest_msg.values("pk")[:1]
+                    ),
+                    latest_msg_content=Subquery(
+                        latest_msg.values("text")[:1]
+                    ), #これはなしでもいい
+                    latest_msg_pub_date=Subquery(
+                        latest_msg.values("time")[:1]
+                    ), #これはなしでもいい
+                ).order_by("-latest_msg_id")
+                
                 for i in hobby:
                     data = data.filter(hobby = i)
                 for i in subject:
@@ -410,7 +437,22 @@ def group_search_result(request):
 @login_required
 def recommended(request):
     user = request.user
-    data = Group.objects.filter(Q(hobby = user.hobby.name)|Q(subject = user.subject.name))
+    user_query = User.objects.filter(username = user.username)
+    latest_msg = GroupTalk.objects.filter(
+                    talk_from=OuterRef("pk") 
+                  ).order_by('-time')
+    data = Group.objects.filter(Q(hobby__in = user_query.values('hobby'))|
+                    Q(subject__in = user_query.values('subject'))).distinct().annotate(
+                    latest_msg_id=Subquery(
+                        latest_msg.values("pk")[:1]
+                    ),
+                    latest_msg_content=Subquery(
+                        latest_msg.values("text")[:1]
+                    ), #これはなしでもいい
+                    latest_msg_pub_date=Subquery(
+                        latest_msg.values("time")[:1]
+                    ), #これはなしでもいい
+                  ).order_by("-latest_msg_id")
     params = {
       'data' : data,
     }
