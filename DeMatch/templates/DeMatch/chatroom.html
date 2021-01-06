@@ -8,6 +8,8 @@
 </head>
 
 <body>
+    <div><a href="{% url 'DeMatch:user_talk_list' %}">戻る</a></div>
+    <div>{{ username }}</div>
     <div id="box">
         {% for log in log %}
         <p class="friend_name">{{ log.talk_from.username }}</p>

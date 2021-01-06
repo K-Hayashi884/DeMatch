@@ -8,70 +8,97 @@
 </div>
 
 <div>
-    {{ group.name }}
+    グループ名 : {{ group.name }}
+</div>
+
+<div>
+    {% if condition == 0 %}
+    <a href="{% url 'DeMatch:group_room' group.id %}">メッセージ</a>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="submit" name="button_5" value="ユーザーを招待">
+    </form>
+    {% endif %}
 </div>
 <div>
     {{ group.introduction }}
 </div>
 <div>
     {% for hobby in group.hobby.all %}
-        {{ hobby.name }}
+    {{ hobby.name }}
     {% endfor %}
 </div>
 <div>
     {% for subject in group.subject.all %}
-        {{ subject.name }}
+    {{ subject.name }}
     {% endfor %}
 </div>
 
 
 <div>
-    
-    {% for inviting in group.inviting.all %}
-    {{ inviting.username }}
-    {{ inviting.id }}
+    {% for member in group.member_list.all %}
+    {{ member.username }}
     {% endfor %}
 </div>
+
 
 <div>
     {% for applying in group.applying.all %}
-    {{ applying.username }}
+    <a href="{% url 'DeMatch:friend_detail' applying.pk %}">
+        {{ applying.username }}
+    </a>
     {% endfor %}
 </div>
 
+<div>
+    招待中リスト :
+    {% for inviting in group.inviting.all %}
+    <div>
+        {{ inviting.username }}
+    </div>
+    {% endfor %}
+</div>
 <!-- 申請前、申請中、招待中、参加後の表示の変化はhtml内で記述 -->
 {% if condition == 0 %}
 <form action="" method="POST">
     {% csrf_token %}
-    <input type="submit" name="button_0" value="編集"> 
+    <input type="submit" name="button_0" value="編集">
 </form>
 {% endif %}
 
 
 
 {% if condition == 1 %}
+
+
 <form action="" method="POST">
     {% csrf_token %}
-    <input type="submit" name="button_1" value="参加する"> 
+    <input type="submit" name="button_1" value="参加する">
 </form>
 <form action="" method="POST">
     {% csrf_token %}
-    <input type="submit" name="button_2" value="参加しない"> 
+    <input type="submit" name="button_2" value="参加しない">
 </form>
 {% endif %}
 
 {% if condition == 2 %}
 <form action="" method="POST">
     {% csrf_token %}
-    <input type="submit" name="button_3" value="申請キャンセル"> 
+    <input type="submit" name="button_3" value="申請キャンセル">
 </form>
 {% endif %}
 
 {% if condition == 3 %}
 <form action="" method="POST">
     {% csrf_token %}
-    <input type="submit" name="button_4" value="参加申請"> 
+    <input type="submit" name="button_4" value="参加申請">
 </form>
 {% endif %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="button_6" value="退会する">
+</form>
+
 
 {% endblock %}
