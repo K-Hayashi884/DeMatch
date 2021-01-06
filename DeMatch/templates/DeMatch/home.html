@@ -14,7 +14,10 @@
 申請が届いています<br>
 <ul>
     {% for group in being_invited_list %}
-    <li><a href="{% url 'DeMatch:group_detail' group.pk %}">{{ group }}</a></li>
+    {% if group.image %}
+    <img src="{{ group.image.url }}" width="100px">
+    {% endif %}
+    <li><a href="{% url 'DeMatch:group_detail' group.pk %}">{{ group.name }}</a></li>
     {% endfor %}
     {% endif %}
 </ul>
@@ -22,7 +25,10 @@
 グループ一覧<br>
 <ul>
     {% for group in group_list %}
-    <li><a href="{% url 'DeMatch:group_detail' group.pk %}">{{ group }}</a></li>
+    {% if group.image %}
+    <img src="{{ group.image.url }}" width="100px">
+    {% endif %}
+    <li><a href="{% url 'DeMatch:group_detail' group.pk %}">{{ group.name }}</a></li>
     {% endfor %}
 </ul>
 {% endif %}
@@ -30,7 +36,10 @@
 申請中<br>
 <ul>
     {% for group in requesting_group_list %}
-    <li><a href="{% url 'DeMatch:group_detail' group.pk %}">{{ group }}</a></li>
+    {% if group.image %}
+    <img src="{{ group.image.url }}" width="100px">
+    {% endif %}
+    <li><a href="{% url 'DeMatch:group_detail' group.pk %}">{{ group.name }}</a></li>
     {% endfor %}
 </ul>
 {% endif %}

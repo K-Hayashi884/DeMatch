@@ -1,5 +1,5 @@
 {% extends 'DeMatch/base.html' %}
-
+{% load static %}
 
 {% block contents %}
 
@@ -10,7 +10,7 @@
 </div>
 
 <div>
-    {{ group.image }}
+    <img src="{{ group.image.url }}" width="100%">
     {{ group.name }}
 </div>
 
