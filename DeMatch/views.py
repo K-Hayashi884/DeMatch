@@ -296,22 +296,16 @@ def account_search(request):
         grade = request.POST.getlist('grade')
         belong_to = request.POST.getlist('belong_to')
         hobby = request.POST.getlist('hobby')
-        print(grade)
-        print(belong_to)
-        print(hobby)
         subject  = request.POST.getlist('subject')
-        print(subject)
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
-                print("aaaaaaaaaaaaaaaaaaaaa")
                 data = User.objects.filter(Q(username__icontains = keyword),Q(grade = grade)|
                               Q(belong_to = belong_to)|Q(hobby__in = hobby)|Q(subject__in = subject)).order_by('last_login').reverse()
-                print("bbbbbbbbbbbbbbbbb")
             elif (choice_method == "and"):
                 data = User.objects.filter(username__icontains = keyword, grade = grade, 
                               belong_to = belong_to, hobby = hobby, subject = subject).order_by('last_login').reverse()
-            print(subject)
+            
             params = {
               'form' : FindForm(request.POST),
               'data' : data,
@@ -330,7 +324,6 @@ def group_search(request):
     #hobbyとsubjectの選択肢をDBから取得して追加
     hobby_choices = Hobby.objects.all()
     subject_choices = Subject.objects.all()
-    print(hobby_choices)
 
     form.fields["hobby"].queryset = hobby_choices
     form.fields["subject"].queryset = subject_choices
