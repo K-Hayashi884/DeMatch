@@ -8,8 +8,11 @@
 </head>
 
 <body>
-    <div><a href="{% url 'DeMatch:group_talk_list' %}">戻る</a></div>
-    <div>{{ groupname }}</div>
+    <div>
+        <a href="{% url 'DeMatch:group_talk_list' %}">戻る</a>
+        {{ groupname }}
+        <a href="{% url 'DeMatch:group_detail' room_name %}">グループ詳細</a>
+    </div>
     <div id="box">
         {% for log in log %}
         <p class="friend_name">{{ log.talk_from.username }}</p>

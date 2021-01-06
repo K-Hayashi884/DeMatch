@@ -4,13 +4,16 @@
 {% block contents %}
 
 <div>
-    <a href="{% url 'DeMatch:home' %}">戻る</a>
+    <!-- 本当の戻るボタン（一個前の画面）だったらこうする必要あり -->
+    <button onclick="history.back()">戻る</button>
+    <!-- <a href="{% url 'DeMatch:home' %}">戻る</a> -->
     グループ詳細
-    <!-- <button onclick="history.back()">戻る</button> -->
 </div>
 
 <div>
+    {% if group.image %}
     <img src="{{ group.image.url }}" width="100%">
+    {% endif %}
     {{ group.name }}
 </div>
 
