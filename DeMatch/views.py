@@ -44,6 +44,7 @@ class GroupCreateView(LoginRequiredMixin, generic.CreateView):
 
 # groupの詳細
 # id一致で取得。id情報はurlに組み込む
+@login_required
 def GroupDetailView(request, pk):
     group = Group.objects.get(pk=pk)
     user = request.user
@@ -91,6 +92,7 @@ def GroupDetailView(request, pk):
         params = {"group": group, "condition": condition}
     return render(request, "DeMatch/group_detail.html", params)
 
+@login_required
 def GroupInviteView(request, pk):
     user = request.user
     group = Group.objects.get(pk=pk)
@@ -305,9 +307,6 @@ class BlockList(LoginRequiredMixin, generic.TemplateView):
         context["block_list"] = block_list
         return context
 
-#部分一致検索
-def orSearch(keyword, belong_to, hobby, subject):
-    pass
 
 
 @login_required
@@ -334,12 +333,18 @@ def account_search(request):
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
-                data = User.objects.filter(Q(username__icontains = keyword),Q(grade = grade)|
-                              Q(belong_to = belong_to)|Q(hobby__in = hobby)|Q(subject__in = subject)).order_by('last_login').reverse()
+                data = User.objects.filter(Q(username__icontains = keyword),Q(grade__in = grade)|
+                              Q(belong_to__in = belong_to)|Q(hobby__in = hobby)|Q(subject__in = subject)).distinct().order_by('last_login').reverse()
             elif (choice_method == "and"):
-                data = User.objects.filter(username__icontains = keyword, grade = grade, 
-                              belong_to = belong_to, hobby = hobby, subject = subject).order_by('last_login').reverse()
-            
+                data = User.objects.filter(username__icontains = keyword).distinct().order_by('last_login').reverse()
+                for i in grade:
+                    data = data.filter(grade = i)
+                for i in belong_to:
+                    data = data.filter(belong_to = i)
+                for i in hobby:
+                    data = data.filter(hobby = i)
+                for i in subject:
+                    data = data.filter(subject = i)
             params = {
               'form' : FindForm(request.POST),
               'data' : data,
@@ -373,12 +378,42 @@ def group_search(request):
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
+                latest_msg = GroupTalk.objects.filter(
+                    talk_from=OuterRef("pk") 
+                ).order_by('time')
                 data = Group.objects.filter(Q(name__icontains = keyword),
-                                            Q(hobby__in = hobby)|Q(subject__in = subject))
+                                            Q(hobby__in = hobby)|Q(subject__in = subject)).distinct().annotate(
+                    latest_msg_id=Subquery(
+                        latest_msg.values("pk")[:1]
+                    ),
+                    latest_msg_content=Subquery(
+                        latest_msg.values("text")[:1]
+                    ), #これはなしでもいい
+                    latest_msg_pub_date=Subquery(
+                        latest_msg.values("time")[:1]
+                    ), #これはなしでもいい
+                ).order_by("-latest_msg_id")
                 #メッセージ最終受信時間で並び替え
             elif (choice_method == "and"):
-                data = Group.objects.filter(name_icontains = keyword,
-                                            hobby__in = hobby, subject__in = subject)
+                latest_msg = GroupTalk.objects.filter(
+                    talk_from=OuterRef("pk") 
+                ).order_by('-time')
+                data = Group.objects.filter(name__icontains = keyword).distinct().annotate(
+                    latest_msg_id=Subquery(
+                        latest_msg.values("pk")[:1]
+                    ),
+                    latest_msg_content=Subquery(
+                        latest_msg.values("text")[:1]
+                    ), #これはなしでもいい
+                    latest_msg_pub_date=Subquery(
+                        latest_msg.values("time")[:1]
+                    ), #これはなしでもいい
+                ).order_by("-latest_msg_id")
+                
+                for i in hobby:
+                    data = data.filter(hobby = i)
+                for i in subject:
+                    data = data.filter(subject = i)
             params = {
               'form' : GroupFindForm(request.POST),
               'data' : data,
@@ -402,13 +437,29 @@ def group_search_result(request):
 @login_required
 def recommended(request):
     user = request.user
-    data = Group.objects.filter(Q(hobby = user.hobby.name)|Q(subject = user.subject.name))
+    user_query = User.objects.filter(username = user.username)
+    latest_msg = GroupTalk.objects.filter(
+                    talk_from=OuterRef("pk") 
+                  ).order_by('-time')
+    data = Group.objects.filter(Q(hobby__in = user_query.values('hobby'))|
+                    Q(subject__in = user_query.values('subject'))).distinct().annotate(
+                    latest_msg_id=Subquery(
+                        latest_msg.values("pk")[:1]
+                    ),
+                    latest_msg_content=Subquery(
+                        latest_msg.values("text")[:1]
+                    ), #これはなしでもいい
+                    latest_msg_pub_date=Subquery(
+                        latest_msg.values("time")[:1]
+                    ), #これはなしでもいい
+                  ).order_by("-latest_msg_id")
     params = {
       'data' : data,
     }
     return render(request, "DeMatch/recommended.html", params)
 
 #チャットルームの表示
+@login_required
 def room(request, pk):
     user = request.user
     friend = User.objects.get(pk=pk)
@@ -422,6 +473,7 @@ def room(request, pk):
     return render(request, 'DeMatch/chatroom.html', params)
 
 #グループチャットルームの表示
+@login_required
 def group_room(request, pk):
     user = request.user
     group = Group.objects.get(pk=pk)
