@@ -3,12 +3,15 @@
 
 {% block contents %}
 
-<div class="container">
-    {{ group.image }}
+<div>
+    <a href="{% url 'DeMatch:home' %}">戻る</a>
+    グループ詳細
+    <!-- <button onclick="history.back()">戻る</button> -->
 </div>
 
 <div>
-    グループ名 : {{ group.name }}
+    {{ group.image }}
+    {{ group.name }}
 </div>
 
 <div>
@@ -36,33 +39,48 @@
 
 
 <div>
-    {% for member in group.member_list.all %}
-    {{ member.username }}
-    {% endfor %}
+    メンバー :
+    <div>
+        {% for member in group.member_list.all %}
+        {{ member.username }}
+        {% endfor %}
+    </div>
 </div>
 
 
 <div>
+    {% if group.applying.all %}
+    参加申請中のユーザー :
     {% for applying in group.applying.all %}
-    <a href="{% url 'DeMatch:friend_detail' applying.pk %}">
-        {{ applying.username }}
-    </a>
+    <div>
+        <a href="{% url 'DeMatch:friend_detail' applying.pk %}">
+            {{ applying.username }}
+        </a>
+    </div>
     {% endfor %}
+    {% endif %}
 </div>
 
 <div>
-    招待中リスト :
+    {% if group.inviting.all %}
+    招待中 :
     {% for inviting in group.inviting.all %}
     <div>
         {{ inviting.username }}
     </div>
     {% endfor %}
+    {% endif %}
 </div>
 <!-- 申請前、申請中、招待中、参加後の表示の変化はhtml内で記述 -->
 {% if condition == 0 %}
 <form action="" method="POST">
     {% csrf_token %}
     <input type="submit" name="button_0" value="編集">
+</form>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="button_6" value="退会する">
 </form>
 {% endif %}
 
@@ -95,10 +113,7 @@
 </form>
 {% endif %}
 
-<form action="" method="POST">
-    {% csrf_token %}
-    <input type="submit" name="button_6" value="退会する">
-</form>
+
 
 
 {% endblock %}

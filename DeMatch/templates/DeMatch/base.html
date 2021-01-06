@@ -22,7 +22,10 @@
     {% block contents %}{% endblock %}
     
     <a href="{% url 'DeMatch:home' %}">home</a>
-    <a href="{% url 'DeMatch:user_talk_list' %}">Talk</a>
+    <a href="{% url 'DeMatch:account_search' %}">search</a>
+    <a href="{% url 'DeMatch:user_talk_list' %}">UserTalk</a>
+    <a href="{% url 'DeMatch:group_talk_list' %}">GroupTalk</a>
+    <a href="{% url 'DeMatch:recommended' %}">recommend</a>
 
   </body>
 
