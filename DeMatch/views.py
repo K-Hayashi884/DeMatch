@@ -5,6 +5,7 @@ from .forms import (
     InputProfileForm,
     FindForm,
     GroupFindForm,
+    GroupInviteForm,
 )
 from django.urls import reverse, reverse_lazy
 from django.views import generic
@@ -66,7 +67,10 @@ def GroupDetailView(request, pk):
         if 'button_0' in request.POST:
             return HttpResponseRedirect(
         reverse('DeMatch:group_update', kwargs={"pk": pk}))
-        if 'button_1' in request.POST:
+        elif 'button_5' in request.POST:
+            return HttpResponseRedirect(
+        reverse('DeMatch:group_invite', kwargs={"pk": pk}))
+        elif 'button_1' in request.POST:
             condition = 0
             inviting.remove(user)
             member_list.add(user)
@@ -78,9 +82,44 @@ def GroupDetailView(request, pk):
         elif 'button_4' in request.POST:
             condition = 2
             applying.add(user)
+        elif 'button_6' in request.POST:
+            member_list.remove(user)
+            if member_list:
+                group.delete()
+        return HttpResponseRedirect(
+        reverse(Home))
         params = {"group": group, "condition": condition}
     return render(request, "DeMatch/group_detail.html", params)
 
+def GroupInviteView(request, pk):
+    user = request.user
+    group = Group.objects.get(pk=pk)
+    member_list = group.member_list
+    inviting = group.inviting
+    applying = group.applying
+    friends = user.friends.exclude(group_member=group).exclude(inviting_user=group).exclude(applying_user=group)
+    form = GroupInviteForm()
+    if request.method == "GET":
+        form.fields['invite'].queryset = friends
+        #招待できる友達がいる：condition=0
+        #いない：condition=1
+        if friends:
+            condition = 0
+        else:
+            condition = 1
+        params = {
+            'form':form,
+            'pk':pk,
+            'condition':condition,
+        }
+        return render(request, "DeMatch/group_invite.html", params)
+    if request.method == "POST":
+        print(request.POST.getlist("invite"))
+        for friend in request.POST.getlist("invite"):
+            group.inviting.add(friend)
+            print(friend)
+        return HttpResponseRedirect(
+        reverse('DeMatch:group_detail', kwargs={"pk": pk}))
 
 # groupの編集
 # id一致で取得。id情報はurlに組み込む
@@ -374,6 +413,7 @@ def room(request, pk):
     # 送信form
     log = UserTalk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
     params = {
+        'username': user.username,
         'log':  log,
         'room_name': pk,
     }
@@ -386,6 +426,7 @@ def group_room(request, pk):
     # 送信form
     log = GroupTalk.objects.filter(talk_to=group)
     params = {
+        'groupname': group.name,
         'log':  log,
         'room_name': pk,
     }

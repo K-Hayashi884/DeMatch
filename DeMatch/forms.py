@@ -41,6 +41,8 @@ class CreateGroupForm(forms.ModelForm):
         )
         group.save()
 
+class GroupInviteForm(forms.Form):
+    invite = forms.ModelMultipleChoiceField(label='invite', queryset=None, widget=forms.CheckboxSelectMultiple)
 
 class InputProfileForm(forms.ModelForm):
     hobby = forms.ModelMultipleChoiceField(

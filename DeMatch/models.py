@@ -130,8 +130,8 @@ class Group(models.Model):
     subject = models.ManyToManyField(Subject, related_name="subject_group", blank=True)
     introduction = models.TextField(max_length=200, blank=True, null=True)
     member_list = models.ManyToManyField(User, related_name="group_member")
-    inviting = models.ManyToManyField(User, related_name="inviting_user")
-    applying = models.ManyToManyField(User, related_name="applying_user")
+    inviting = models.ManyToManyField(User, related_name="inviting_user", blank=True)
+    applying = models.ManyToManyField(User, related_name="applying_user", blank=True)
 
     def __str__(self):
         return self.name

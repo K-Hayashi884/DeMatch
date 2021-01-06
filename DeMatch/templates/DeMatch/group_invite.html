@@ -1,7 +1,10 @@
 {% extends 'DeMatch/base.html' %}
+
 {% load static %}
 
 {% block contents %}
+
+{% if condition == 0 %}
 <div class="container">
     <div class="row">
         <form method="POST" enctype="multipart/form-data">
@@ -10,7 +13,15 @@
             {{ form.as_table }}
         </table>
         <button class="" type="submit">完了</button>
+        <a href="{% url 'DeMatch:group_detail' pk %}">キャンセル</a>
         </form>
     </div>
 </div>
+{% endif %}
+
+{% if condition == 1 %}
+<p>招待できる友達がいません。</p>
+<a href="{% url 'DeMatch:group_detail' pk %}">キャンセル</a>
+{% endif %}
+
 {% endblock %}

@@ -26,6 +26,8 @@ urlpatterns = [
     path("create_group/", views.GroupCreateView.as_view(), name="create_group"),
     #グループ詳細ページ
     path("group_detail/<int:pk>/", views.GroupDetailView, name="group_detail"),
+    #グループ招待ページ
+    path("group_invite/<int:pk>/", views.GroupInviteView, name="group_invite"),
     #グループ更新ページ
     path("group_update/<int:pk>/", views.GroupUpdateView.as_view(), name="group_update"),
     #検索ページ

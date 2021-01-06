@@ -1,6 +1,11 @@
 {% extends 'DeMatch/base.html' %}
 
+
 {% block contents %}
+<div>
+    <a href="{%url 'DeMatch:create_group'%}">グループ作成</a>
+</div>
+
 <a href="{% url 'DeMatch:user_detail'%}">{{ user }}</a><br>
 
 {% if being_invited_list %}
