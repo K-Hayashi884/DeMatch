@@ -1,0 +1,12 @@
+.back__button {
+    float: left;
+}
+
+.friend_name {
+    display: inline-block;
+    text-align: center;
+}
+
+.detail__button {
+    float: right;
+}
