@@ -331,19 +331,15 @@ def account_search(request):
         hobby = request.POST.getlist('hobby')
         subject  = request.POST.getlist('subject')
         choice_method = request.POST['choice_method']
+        user = request.user
         if (form.is_valid):
             if (choice_method == "or"):
-                data = User.objects.filter(Q(username__icontains = keyword)|Q(grade__in = grade)|
+                data = User.objects.exclude(pk = user.pk).filter(Q(username__icontains = keyword)|Q(grade__in = grade)|
                               Q(belong_to__in = belong_to)|Q(hobby__in = hobby)|Q(subject__in = subject)).distinct().order_by('last_login').reverse()
-                print(keyword)
-                print(grade)
-                print(belong_to)
-                print(hobby)
-                print(subject)
-                print(data)
+                
 
             elif (choice_method == "and"):
-                data = User.objects.filter(username__icontains = keyword).distinct().order_by('last_login').reverse()
+                data = User.objects.exclude(pk = user.pk).filter(username__icontains = keyword).distinct().order_by('last_login').reverse()
                 for i in grade:
                     data = data.filter(grade = i)
                 for i in belong_to:
