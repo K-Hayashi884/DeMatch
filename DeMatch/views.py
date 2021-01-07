@@ -467,6 +467,7 @@ def room(request, pk):
     log = UserTalk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
     params = {
         'username': user.username,
+        'friendname':friend.username,
         'log':  log,
         'room_name': pk,
     }

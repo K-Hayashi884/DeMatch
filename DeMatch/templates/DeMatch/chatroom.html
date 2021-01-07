@@ -1,22 +1,46 @@
 <!-- chat/templates/chat/room.html -->
+{% load static %}
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8" />
     <title>Chat Room</title>
+    <link rel="stylesheet" type="text/css" href="{%  static 'css/chatroom.css' %}">
+    <!-- <link rel="stylesheet" type="text/css" href="static/css/chatroom.css"> -->
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
 </head>
 
 <body>
-    <div>
-        <a href="{% url 'DeMatch:user_talk_list' %}">戻る</a>
-        {{ username }}
-        <a href="{% url 'DeMatch:friend_detail' room_name %}">プロフィール</a>
+    <div class="header">
+        <div class="back__button">
+            <a href="{% url 'DeMatch:user_talk_list' %}">
+                <i class="fas fa-angle-left"></i>
+            </a>
+        </div>
+        <div class="friend_name">
+            {{ friendname }}
+        </div>
+        <div class="detail__button">
+            <a href="{% url 'DeMatch:friend_detail' room_name %}">
+                <i class="fas fa-user"></i>
+            </a>
+        </div>
     </div>
+
     <div id="box">
         {% for log in log %}
-        <p class="friend_name">{{ log.talk_from.username }}</p>
-        <p class="msg">{{ log.text }}</p>
+        {% if log.talk_from.username == username %}
+        <div class="log_user">
+            <p class="log_username">{{ log.talk_from.username }}</p>
+            <p class="msg">{{ log.text }}</p>
+        </div>
+        {% else %}
+        <div class="log_friend">
+            <p class="log_username">{{ log.talk_from.username }}</p>
+            <p class="msg">{{ log.text }}</p>
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
     <input id="chat-message-input" type="text" size="100">
