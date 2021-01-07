@@ -333,8 +333,15 @@ def account_search(request):
         choice_method = request.POST['choice_method']
         if (form.is_valid):
             if (choice_method == "or"):
-                data = User.objects.filter(Q(username__icontains = keyword),Q(grade__in = grade)|
+                data = User.objects.filter(Q(username__icontains = keyword)|Q(grade__in = grade)|
                               Q(belong_to__in = belong_to)|Q(hobby__in = hobby)|Q(subject__in = subject)).distinct().order_by('last_login').reverse()
+                print(keyword)
+                print(grade)
+                print(belong_to)
+                print(hobby)
+                print(subject)
+                print(data)
+
             elif (choice_method == "and"):
                 data = User.objects.filter(username__icontains = keyword).distinct().order_by('last_login').reverse()
                 for i in grade:
@@ -381,7 +388,7 @@ def group_search(request):
                 latest_msg = GroupTalk.objects.filter(
                     talk_from=OuterRef("pk") 
                 ).order_by('time')
-                data = Group.objects.filter(Q(name__icontains = keyword),
+                data = Group.objects.filter(Q(name__icontains = keyword)|
                                             Q(hobby__in = hobby)|Q(subject__in = subject)).distinct().annotate(
                     latest_msg_id=Subquery(
                         latest_msg.values("pk")[:1]
