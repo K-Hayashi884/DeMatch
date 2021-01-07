@@ -1,4 +1,7 @@
+{% extends 'DeMatch/base.html' %}
 
+
+{% block contents %}
 <a href="{% url 'DeMatch:group_talk_list' %}">group_talk_list</a>
 
 {% for friend in friends %}
@@ -8,3 +11,4 @@
 
 
 {% endfor %}
+{% endblock %}
