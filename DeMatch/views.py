@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Q, Subquery
 import datetime  
 from django.http import HttpResponseRedirect
+import requests, base64, json
 
 #groupの作成
 class GroupCreateView(LoginRequiredMixin, generic.CreateView):
@@ -467,7 +468,7 @@ def room(request, pk):
     user = request.user
     friend = User.objects.get(pk=pk)
     # 送信form
-    log = UserTalk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend))
+    log = UserTalk.objects.filter(Q(talk_from=user, talk_to=friend) | Q(talk_to=user, talk_from=friend)).order_by('time')
     params = {
         'username': user.username,
         'friendname':friend.username,
@@ -482,7 +483,7 @@ def group_room(request, pk):
     user = request.user
     group = Group.objects.get(pk=pk)
     # 送信form
-    log = GroupTalk.objects.filter(talk_to=group)
+    log = GroupTalk.objects.filter(talk_to=group).order_by('time')
     params = {
         'groupname': group.name,
         'log':  log,
@@ -537,3 +538,92 @@ def group_talk_list(request):
         "groups" : groups,
     }
     return render(request, "DeMatch/group_talk_list.html", params)
+
+
+def auth(request):
+    '''認証ページへリダイレクトさせる'''
+
+    client_id = 't0TjalnoQ1Ky3mpm81knQ'
+    client_secret = 'GAyM836XwRc5pfqQo0aahDFcIdXf7yqm'
+
+    if 'code' not in request.GET:
+        print('get code')
+        auth_url = 'https://zoom.us/oauth/authorize'
+        response_type = 'code'
+        redirect_uri = 'http://127.0.0.1:8000/auth'
+        auth_href = auth_url + '?response_type=' + response_type + '&client_id=' + client_id + '&redirect_uri=' + redirect_uri
+        
+        return render(request, 'DeMatch/auth.html', {
+            'auth_href': auth_href
+        })
+    else:
+        print('get token')
+        auth_url = 'https://zoom.us/oauth/token'
+        code = request.GET.get('code')
+        grant_type = 'authorization_code'
+        redirect_uri = 'http://127.0.0.1:8000/auth/'
+
+        # basic認証用のコードを作成（client_ID:Client_Secretをbase64エンコード）
+        client_basic = base64.b64encode('{0}:{1}'.format(client_id, client_secret).encode())
+
+        # POST用のパラメータとカスタムヘッダを作成する
+        post_payload = {
+            'code': code,
+            'grant_type': grant_type,
+            'redirect_uri': redirect_uri
+        }
+        post_header = {
+            'Authorization': 'Basic {0}'.format(client_basic.decode())
+        }
+
+        # # Exec POST
+        response = requests.post(auth_url, data=post_payload, headers=post_header)
+        response_text = json.loads(response.text)
+
+        if 'access_token' in response_text:
+            # 認証結果をセッションに保存
+            request.session['zoom_access_token'] = response_text['access_token']
+            request.session['zoom_token_type'] = response_text['token_type']
+            request.session['zoom_refresh_token'] = response_text['refresh_token']
+            request.session['zoom_expires_in'] = response_text['expires_in']
+            request.session['zoom_scope'] = response_text['scope']
+
+            return redirect('DeMatch:zoom_auth_complete')
+        else:
+            return render(request, 'DeMatch/auth.html', {
+                'auth_href': 'hoge'
+            })
+
+#Zoom 部屋の作成
+def auth_complete(request):
+    '''認証完了ページ'''
+
+    get_user_url = 'https://api.zoom.us/v2/users'
+    access_token = request.session['zoom_access_token']
+
+    # ユーザー情報の取得
+    get_user_headers = {
+        'Authorization': 'Bearer {0}'.format(access_token)
+    }
+    get_user_response = requests.get(get_user_url, headers=get_user_headers)
+    get_user_response_text = json.loads(get_user_response.text)
+    user_info = get_user_response_text['users'][0]
+
+    # 部屋の作成
+    create_meeting_url = 'https://api.zoom.us/v2/users/{0}/meetings'.format(user_info['id'])
+    create_meeting_params = {
+        'topic': 'Sample Meeting',
+        'type': 2, # scheduled meeting
+        'start_time': '2021-11-02 T 12:00:00',
+        'duration': 180,
+        'timezone': user_info['timezone'],
+    }
+    create_meeting_params_json = json.dumps(create_meeting_params).encode('utf-8')
+    create_meeting_headers = {
+        'Authorization': 'Bearer {0}'.format(access_token),
+        'Content-Type': 'application/json'
+    }
+    create_meeting_response = requests.post(create_meeting_url, data=create_meeting_params_json.decode(), headers=create_meeting_headers)
+    create_meeting_response_text = json.loads(create_meeting_response.text)
+    
+    return render(request, 'DeMatch/complete.html')
