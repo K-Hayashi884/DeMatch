@@ -550,7 +550,7 @@ def auth(request):
         print('get code')
         auth_url = 'https://zoom.us/oauth/authorize'
         response_type = 'code'
-        redirect_uri = 'http://127.0.0.1:8000/auth'
+        redirect_uri = 'https://dematch.herokuapp.com/auth/'
         auth_href = auth_url + '?response_type=' + response_type + '&client_id=' + client_id + '&redirect_uri=' + redirect_uri
         
         return render(request, 'DeMatch/auth.html', {
@@ -561,7 +561,7 @@ def auth(request):
         auth_url = 'https://zoom.us/oauth/token'
         code = request.GET.get('code')
         grant_type = 'authorization_code'
-        redirect_uri = 'http://127.0.0.1:8000/auth/'
+        redirect_uri = 'https://dematch.herokuapp.com/auth/'
 
         # basic認証用のコードを作成（client_ID:Client_Secretをbase64エンコード）
         client_basic = base64.b64encode('{0}:{1}'.format(client_id, client_secret).encode())
