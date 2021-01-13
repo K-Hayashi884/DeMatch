@@ -1,7 +1,31 @@
-{% for item in data %}
+{% extends 'DeMatch/base.html' %}
+{% load static %}
+{% block title %}おすすめ{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/search_result.css' %}">
+{% endblock %}
 
-<img src="" alt="">
-{{ item.name }}
+{% block contents %}
 
-{% endfor %}
+<a href="{% url 'DeMatch:group_search' %}">前</a>
+
+<div class="main_wrapper">
+    <p>あなたと興味が近いグループ</p>
+    {% for item in data %}
+    <div class="user_wrapper">
+        <a href="{% url 'DeMatch:group_detail' item.pk %}" class="user">
+        {% if item.image %}
+            <img class="user_icon" src="../../../media/{{ item.image }}" >
+        {% else %}
+            <img class="user_icon" src="../../../media/user_images/noimage.png">
+        {% endif %}
+            <p class="username">
+            {{ item.name }}
+        </p>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
