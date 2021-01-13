@@ -178,6 +178,11 @@ CHANNEL_LAYERS = {
     },
 }
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+SECRET_KEY = os.environ.get(key='SECRET_KEY')
+
+
+
 try:
     from .local_settings import *
 except ImportError:
@@ -187,4 +192,3 @@ if not DEBUG:
     import django_heroku
     django_heroku.settings(locals())
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
