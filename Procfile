@@ -1,1 +1,1 @@
-web: gunicorn config.wsgi --log-file -
+web: gunicorn kyoudou_kaihatsu_A.wsgi --log-file -
