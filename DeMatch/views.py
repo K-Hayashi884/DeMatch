@@ -510,15 +510,11 @@ def user_talk_list(request):
     ).order_by("-latest_msg_id")
     lenge_dict = {}
     for friend in friends:
-        # lenge = len(str(friend.latest_msg_content))
         short_msg = str(friend.latest_msg_content)[0:20]
         lenge = len(str(short_msg))
         lenge_dict[friend] = [lenge, short_msg]
         print(lenge_dict)
 
-    #print(friends.latest_msg_content)
-    #long_msg = len(friends.latest_msg_content) > 1
-    #short_msg = latest_msg[:1]
     params = {
         "user": user,
         "friends": friends,
