@@ -1,14 +1,44 @@
 {% extends 'DeMatch/base.html' %}
+{% load static %}
 
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/talk_list.css' %}">
+{% endblock %}
 
 {% block contents %}
 <a href="{% url 'DeMatch:group_talk_list' %}">group_talk_list</a>
 
-{% for friend in friends %}
-
-<a href="{% url 'DeMatch:room' friend.pk %}">{{ friend.username }}</a>
 
 
+<div class="main_wrapper">
+    {% for item, lenge in lenge_dict.items %}
+    <div class="user_wrapper">
+        <a href="{% url 'DeMatch:room' item.pk %}" class="user">
+        {% if item.main_img_source %}
+            <img class="user_icon" src="../../../media/{{ item.main_img_source }}" >
+        {% else %}
+            <img class="user_icon" src="../../../media/user_images/noimage.png">
+        {% endif %}
+            <div class="name_msg">
+                <p class="username">
+                {{ item.username }}
+                </p>
+                <div class="msg_date">
+                {% if item.latest_msg_content is not None %}
+                    {% if lenge.0 >= 20 %}
+                    <p class="msg">{{ lenge.1 }}...</p>
+                    {% else %}
+                    <p class="msg">{{ item.latest_msg_content }}</p>
+                    {% endif %}
+                <p class="date">{{ item.latest_msg_pub_date|date:"H:i" }}</p>
+                {% else %}
+                <p class="msg">メッセージはありません</p>
+                {% endif %}
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
 
-{% endfor %}
 {% endblock %}

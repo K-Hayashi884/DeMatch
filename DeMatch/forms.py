@@ -69,7 +69,8 @@ class InputProfileForm(forms.ModelForm):
 
 #検索フォーム
 class FindForm(forms.Form):
-    keyword = forms.CharField(required=False, label='keyword') #検索キーワード
+    keyword = forms.CharField(required=False, label='keyword',
+                                widget=forms.TextInput(attrs={'placeholder':'  キーワード入力'})) #検索キーワード
     grade = forms.MultipleChoiceField(label='grade', widget=forms.CheckboxSelectMultiple,
         choices=[
                   ("B1", "学部１回生"),
@@ -121,7 +122,8 @@ class FindForm(forms.Form):
 
 #グループ検索フォーム
 class GroupFindForm(forms.Form):
-    keyword = forms.CharField(required=False, label='keyword') #検索キーワード
+    keyword = forms.CharField(required=False, label='keyword',
+                                widget=forms.TextInput(attrs={'placeholder':'  キーワード入力'})) #検索キーワード
     
     hobby = forms.ModelMultipleChoiceField(label='hobby', queryset=None, required=False, widget=forms.CheckboxSelectMultiple) #趣味
     subject = forms.ModelMultipleChoiceField(label='subjectField', queryset=None, required=False, widget=forms.CheckboxSelectMultiple) #勉強分野

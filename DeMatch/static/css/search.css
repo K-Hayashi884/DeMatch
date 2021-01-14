@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+.main_wrapper {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.search_wrapper {
+    display: flex;
+    border-radius: 10px;
+    background-color: rgb(231, 231, 231);
+}
+
+.search {
+    margin: 5px;
+    padding: 0 auto;
+    display: block;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    line-height: 30px;
+    height: 30px;
+    width: 50%;
+}
+
+.account_search {
+    background-color: white;
+    border-radius: 10px;
+}
+
+form li {
+    width: 40%;
+}
+
+p label {
+    display: none;
+}
+
+#id_keyword {
+    height: 30px;
+    width: 100%;
+    border-radius: 10px;
+    border-color: rgb(187, 187, 187);
+    
+}
+
+form button {
+    display: block;
+    background: rgb(0, 53, 99);
+    color: white;
+    border-radius: 10px;
+    height: 40px;
+    width: 200px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+

@@ -508,9 +508,17 @@ def user_talk_list(request):
            latest_msg.values("time")[:1]
        ),
     ).order_by("-latest_msg_id")
+    lenge_dict = {}
+    for friend in friends:
+        short_msg = str(friend.latest_msg_content)[0:20]
+        lenge = len(str(short_msg))
+        lenge_dict[friend] = [lenge, short_msg]
+        print(lenge_dict)
+
     params = {
         "user": user,
         "friends": friends,
+        "lenge_dict": lenge_dict,
     }
     return render(request, "DeMatch/user_talk_list.html", params)
 

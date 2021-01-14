@@ -1,6 +1,30 @@
-{% for item in data %}
-<a href="{% url 'DeMatch:group_detail' item.pk %}">
-<img src="" > 
-{{ item.name }}
-</a>
-{% endfor %}
+{% extends 'DeMatch/base.html' %}
+{% load static %}
+{% block title %}検索結果{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/search_result.css' %}">
+{% endblock %}
+
+{% block contents %}
+
+<a href="{% url 'DeMatch:group_search' %}">前</a>
+
+<div class="main_wrapper">
+    {% for item in data %}
+    <div class="user_wrapper">
+        <a href="{% url 'DeMatch:group_detail' item.pk %}" class="user">
+        {% if item.image %}
+            <img class="user_icon" src="../../../media/{{ item.image }}" >
+        {% else %}
+            <img class="user_icon" src="../../../media/user_images/noimage.png">
+        {% endif %}
+            <p class="username">
+            {{ item.name }}
+        </p>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

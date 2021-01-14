@@ -1,6 +1,23 @@
-<a href="{% url 'DeMatch:group_search' %}"> group_search</a>
-<form method='post' action='.'>
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type='submit'>submit</button>
-</form>
+{% extends 'DeMatch/base.html' %}
+{% load static %}
+
+{% block title %}account_search{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css\search.css' %}">
+{% endblock %}
+
+
+{% block contents %}
+<div class="main_wrapper">
+    <div class="search_wrapper">
+        <p class="account_search search">人を探す</p>
+        <a href="{% url 'DeMatch:group_search' %}" class="group_search search">グループを探す</a>
+    </div>
+    <form method='post' action='.'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type='submit'>検索</button>
+    </form>
+</div>
+{% endblock %}

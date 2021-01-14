@@ -1,25 +1,57 @@
 {% extends 'DeMatch/base.html' %}
-
-{% block header-title %}友達{% endblock %}
+{% load static %}
+{% block title %}友達{% endblock %}
  
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/talk_list.css' %}">
+{% endblock %}
+
 {% block contents %}
 <div class="friends">
-   <!-- 友達のリスト表示部分 -->
-   <ul class="friends__list-wrap">
-       {% for friend in friends %}
-       <li class="friends__list">
-           <!-- それぞれが別のトーク画面に飛ぶようにリンクをはる -->
-           <a href="{% url 'DeMatch:room' friend.id %}">
-               <div>{{ friend.username }}</div>
-               <div>
-                   <p>{{ friend.latest_msg_content }}</p>
-                   <p>{{ friend.latest_msg_pub_date|date:"n/j H:i" }}</p>
-               </div>
-           </a>
-       </li>
-       {% endfor %}
+    <!-- 友達のリスト表示部分 -->
+    <ul class="friends_list_wrapper">
+        {% for friend in friends %}
+        <li class="friends_list">
+            <!-- それぞれが別のトーク画面に飛ぶようにリンクをはる -->
+            <a href="{% url 'DeMatch:room' friend.id %}">
+                {% if friend.main_img_source %}
+                    <img class="user_icon" src="../../../media/{{ friend.main_img_source }}">
+                    <p>aiueo
+
+                    </p>
+                {% else %}
+                    <img class="user_icon" src="../../../media/user_images/noimage.png">
+                    <p>aiueo</p>
+                {% endif %}
+                <div>{{ friend.username }}</div>
+                <div>
+                    <p>{{ friend.latest_msg_content }}</p>
+                    <p>{{ friend.latest_msg_pub_date|date:"n/j H:i" }}</p>
+                </div>
+            </a>
+        </li>
+        {% endfor %}
  
-   </ul>
+    </ul>
 </div>
  
-{% endblock contents %}
+
+<div class="main_wrapper">
+    {% for item in friends %}
+    <div class="user_wrapper">
+        <a href="{% url 'DeMatch:friend_detail' item.pk %}" class="user">
+        {% if item.main_img_source %}
+            <img class="user_icon" src="../../../media/{{ item.main_img_source }}" >
+        {% else %}
+            <img class="user_icon" src="../../../media/user_images/noimage.png">
+        {% endif %}
+            <p class="username">
+            {{ item.username }}
+        </p>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}
