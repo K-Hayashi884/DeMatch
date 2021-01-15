@@ -613,7 +613,7 @@ def auth_complete(request):
     create_meeting_url = 'https://api.zoom.us/v2/users/{0}/meetings'.format(user_info['id'])
     create_meeting_params = {
         'topic': 'Sample Meeting',
-        'type': 1, # scheduled meeting
+        'type': 2, # scheduled meeting
         'start_time': '2021-11-02 T 12:00:00',
         'duration': 40,
         'timezone': user_info['timezone'],
@@ -624,7 +624,11 @@ def auth_complete(request):
         'Content-Type': 'application/json'
     }
     create_meeting_response = requests.post(create_meeting_url, data=create_meeting_params_json.decode(), headers=create_meeting_headers)
-    create_meeting_response_text = json.loads(create_meeting_response.text)
+    # create_meeting_response_text = json.loads(create_meeting_response.text)
+    join_url = create_meeting_response.join_url
+    params = {
+        'join_url':join_url,
+    }
     
     
-    return render(request, 'DeMatch/complete.html')
+    return render(request, 'DeMatch/complete.html', params)
