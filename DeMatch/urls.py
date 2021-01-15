@@ -44,6 +44,4 @@ urlpatterns = [
     path('DeMatch/Group/<int:pk>/', views.group_room, name='group_room'),
     path('talk_list/', views.user_talk_list, name="user_talk_list"),
     path("group_list/", views.group_talk_list, name="group_talk_list"),
-    path('auth/', views.auth, name='zoom_auth'),
-    path('complete/', views.auth_complete, name='zoom_auth_complete'),
 ]
