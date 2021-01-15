@@ -613,7 +613,7 @@ def auth_complete(request):
     create_meeting_url = 'https://api.zoom.us/v2/users/{0}/meetings'.format(user_info['id'])
     create_meeting_params = {
         'topic': 'Sample Meeting',
-        'type': 2, # scheduled meeting
+        'type': 1, # scheduled meeting
         'start_time': '2021-11-02 T 12:00:00',
         'duration': 40,
         'timezone': user_info['timezone'],
