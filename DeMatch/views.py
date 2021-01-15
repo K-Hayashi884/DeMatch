@@ -615,7 +615,7 @@ def auth_complete(request):
         'topic': 'Sample Meeting',
         'type': 2, # scheduled meeting
         'start_time': '2021-11-02 T 12:00:00',
-        'duration': 180,
+        'duration': 40,
         'timezone': user_info['timezone'],
     }
     create_meeting_params_json = json.dumps(create_meeting_params).encode('utf-8')
@@ -625,5 +625,6 @@ def auth_complete(request):
     }
     create_meeting_response = requests.post(create_meeting_url, data=create_meeting_params_json.decode(), headers=create_meeting_headers)
     create_meeting_response_text = json.loads(create_meeting_response.text)
+    print(request)
     
     return render(request, 'DeMatch/complete.html')
