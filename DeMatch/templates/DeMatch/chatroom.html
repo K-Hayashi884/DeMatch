@@ -44,7 +44,6 @@
         {% endfor %}
     </div>
 
-    {{ join_url }}
     {% if join_url %}
     <input id="chat-message-input" type="text" size="100" value="{{ join_url }}">
     {% else %}
@@ -54,7 +53,7 @@
     {{ room_name|json_script:"room-name" }}
     <a href="{{ auth_href }}">zoomを開始する</a>
 
-    
+
 
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
@@ -102,6 +101,12 @@
             }));
             messageInputDom.value = '';
         };
+
+        $(function () {
+            $('.js-autolink').each(function () {
+                $(this).html($(this).html().replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1'>$1</a>"));
+            });
+        });
     </script>
 </body>
 
