@@ -476,7 +476,7 @@ def room(request, pk):
         print('get code')
         auth_url = 'https://zoom.us/oauth/authorize'
         response_type = 'code'
-        redirect_uri = 'https://dematch.herokuapp.com/auth/'
+        redirect_uri = 'https://dematch.herokuapp.com/DeMatch/User/' + user.pk
         auth_href = auth_url + '?response_type=' + response_type + '&client_id=' + client_id + '&redirect_uri=' + redirect_uri
     else:
         print('get token')
