@@ -625,8 +625,12 @@ def auth_complete(request):
     }
     create_meeting_response = requests.post(create_meeting_url, data=create_meeting_params_json.decode(), headers=create_meeting_headers)
     # create_meeting_response_text = json.loads(create_meeting_response.text)
-    join_url = create_meeting_response.text['join_url']
+    headers = create_meeting_response.headers
+    encoding = create_meeting_response.encoding
+    join_url = create_meeting_response.text['3']
     params = {
+        'headers':headers,
+        'encoding':encoding,
         'join_url':join_url,
     }
     
