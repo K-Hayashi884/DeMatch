@@ -636,7 +636,7 @@ def group_room(request, pk):
                 'auth_href': auth_href,
                 'join_url':join_url,
             }
-            return render(request, 'DeMatch/chatroom.html', params)
+            return render(request, 'DeMatch/group_chatroom.html', params)
     params = {
         'username': user.username,
         'groupname': group.name,
