@@ -33,19 +33,28 @@
         {% if log.talk_from.username == username %}
         <div class="log_user">
             <p class="log_username">{{ log.talk_from.username }}</p>
-            <p class="msg">{{ log.text }}</p>
+            <p class="msg">{{ log.text|urlize }}</p>
         </div>
         {% else %}
         <div class="log_friend">
             <p class="log_username">{{ log.talk_from.username }}</p>
-            <p class="msg">{{ log.text }}</p>
+            <p class="msg">{{ log.text|urlize }}</p>
         </div>
         {% endif %}
         {% endfor %}
     </div>
+
+    {% if join_url %}
+    <input id="chat-message-input" type="text" size="100" value="{{ join_url }}">
+    {% else %}
     <input id="chat-message-input" type="text" size="100">
+    {% endif %}
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
+
+    <a href="{{ auth_href }}"><i class="fas fa-video"></i></a>
+
+
 
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
@@ -72,6 +81,13 @@
             var parentDiv = document.getElementById("box");
             parentDiv.appendChild(newElement1);
             parentDiv.appendChild(newElement2);
+
+            const display = document.getElementById('box')
+            const regex = new RegExp(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig)
+            if (newElement2.textContent.match(regex)) {
+                console.log(newElement2.textContent.replace(regex, '<a href="$1">$1</a>'))
+                 newElement2.innerHTML = newElement2.textContent.replace(regex, '<a href="$1">$1</a>')
+            }
         };
 
         chatSocket.onclose = function (e) {
@@ -94,6 +110,7 @@
             messageInputDom.value = '';
         };
     </script>
+
 </body>
 
 </html>
