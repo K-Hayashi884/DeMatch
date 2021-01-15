@@ -5,6 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Chat Room</title>
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
 </head>
 
 <body>
@@ -35,8 +36,8 @@
     {% endif %}
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
-    
-    <a href="{{ auth_href }}">zoomを開始する</a>
+
+    <a href="{{ auth_href }}"><i class="fas fa-video"></i></a>
 
 
     <script>
