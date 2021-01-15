@@ -483,7 +483,7 @@ def room(request, pk):
         auth_url = 'https://zoom.us/oauth/token'
         code = request.GET.get('code')
         grant_type = 'authorization_code'
-        redirect_uri = 'https://dematch.herokuapp.com/auth/'
+        redirect_uri = 'https://dematch.herokuapp.com/DeMatch/User/' + str(user.pk)
 
         # basic認証用のコードを作成（client_ID:Client_Secretをbase64エンコード）
         client_basic = base64.b64encode('{0}:{1}'.format(client_id, client_secret).encode())
@@ -547,8 +547,6 @@ def room(request, pk):
                 'join_url':join_url,
             }
             return render(request, 'DeMatch/chatroom.html', params)
-        else:
-            auth_href = 'hoge'
 
     params = {
         'username': user.username,
